@@ -7,6 +7,7 @@ import { useAppStore } from "../../../store/useAppStore";
 import LazyLottie from "../../lazyLottie";
 import toast from "react-hot-toast";
 import { isElectron } from "react-device-detect";
+import { Capacitor } from "@capacitor/core";
 import { ConfigService } from "../../../assets/lib/kookit-extra-browser.min";
 import {
   exportToLocalFile,
@@ -14,6 +15,9 @@ import {
 } from "../../../utils/file/localFile";
 
 const LocalFileDialog = () => {
+  if (Capacitor.isNativePlatform()) {
+    return null;
+  }
   const handleLocalFileDialog = useAppStore((s) => s.handleLocalFileDialog);
   const handleFetchBooks = useAppStore((s) => s.handleFetchBooks);
   const { t } = useTranslation();

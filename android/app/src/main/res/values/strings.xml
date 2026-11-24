@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">T-Ebook</string>
+    <string name="title_activity_main">T-Ebook</string>
+    <string name="package_name">com.ntt.tebook</string>
+    <string name="custom_url_scheme">com.ntt.tebook</string>
+</resources>

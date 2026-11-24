@@ -43,6 +43,7 @@ import {
 import { driveList } from "../../constants/driveList";
 import SupportDialog from "../../components/dialogs/supportDialog";
 import { LocalFileManager } from "../../utils/file/localFile";
+import { Capacitor } from "@capacitor/core";
 import packageJson from "../../../package.json";
 import { getTempToken, updateUserConfig } from "../../utils/request/user";
 import i18n from "../../i18n";
@@ -475,7 +476,7 @@ const Header = (props: HeaderProps) => {
             return;
           }
           let result = await vexComfirmAsync(
-            `<h3>${t("Enable Koodo Sync")}</h3><p>${
+            `<h3>${t("Enable T-Ebook Sync")}</h3><p>${
               t("To enjoy a faster and seamless synchronization experience.") +
               " " +
               t(
@@ -652,22 +653,26 @@ const Header = (props: HeaderProps) => {
         }
       } else {
         await upgradeConfig();
-        const status = await LocalFileManager.getPermissionStatus();
-        if (
-          !ConfigService.getItem("isUseLocal") &&
-          LocalFileManager.isSupported()
-        ) {
-          handleLocalFileDialog(true);
-        } else if (
-          ConfigService.getItem("isUseLocal") === "yes" &&
-          !status.directoryName
-        ) {
-          handleLocalFileDialog(true);
-        } else if (
-          ConfigService.getItem("isUseLocal") === "yes" &&
-          (status.needsReauthorization || !status.hasAccess)
-        ) {
-          handleLocalFileDialog(true);
+        if (Capacitor.isNativePlatform()) {
+          ConfigService.setItem("isUseLocal", "no");
+        } else {
+          const status = await LocalFileManager.getPermissionStatus();
+          if (
+            !ConfigService.getItem("isUseLocal") &&
+            LocalFileManager.isSupported()
+          ) {
+            handleLocalFileDialog(true);
+          } else if (
+            ConfigService.getItem("isUseLocal") === "yes" &&
+            !status.directoryName
+          ) {
+            handleLocalFileDialog(true);
+          } else if (
+            ConfigService.getItem("isUseLocal") === "yes" &&
+            (status.needsReauthorization || !status.hasAccess)
+          ) {
+            handleLocalFileDialog(true);
+          }
         }
       }
       handleCloudSyncFunc(async (userInfo?: any) => {
@@ -764,8 +769,13 @@ const Header = (props: HeaderProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthed]);
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
   return (
-    <div className="header" style={isCollapsed ? { marginLeft: "40px" } : {}}>
+    <div
+      className="header"
+      style={isCollapsed && !isMobile ? { marginLeft: "40px" } : {}}
+    >
       {isAuthed && (
         <div
           className="header-chat-widget"
@@ -807,13 +817,13 @@ const Header = (props: HeaderProps) => {
       )}
       <div
         className="header-search-container"
-        style={isCollapsed ? { width: "369px" } : {}}
+        style={isCollapsed && !isMobile ? { width: "369px" } : {}}
       >
         <SearchBox />
       </div>
       <div
         className="setting-icon-parrent"
-        style={isCollapsed ? { marginLeft: "430px" } : {}}
+        style={isCollapsed && !isMobile ? { marginLeft: "430px" } : {}}
       >
         <div
           className="setting-icon-container"
@@ -898,18 +908,9 @@ const Header = (props: HeaderProps) => {
               let userInfo = await handleFetchUserInfo();
               await handleCloudSync(userInfo);
             } else {
-              if (
-                ConfigService.getReaderConfig("isEnableKoReaderSync") !== "yes"
-              ) {
-                toast(t("Please upgrade to Pro to use this feature"));
-                handleSetting(true);
-                handleSettingMode("account");
-                setIsSync(false);
-              } else {
-                setIsSync(true);
-                await handleKOReaderSync();
-                setIsSync(false);
-              }
+              setIsSync(true);
+              await handleKOReaderSync();
+              setIsSync(false);
             }
           }}
           style={{ marginTop: "2px" }}
@@ -928,133 +929,6 @@ const Header = (props: HeaderProps) => {
           </span>
         </div>
       </div>
-
-      {!isAuthed &&
-      !state.isHidePro &&
-      window.location.hostname !== "web.koodoreader.cn" ? (
-        <div className="header-report-container">
-          <span
-            style={{ textDecoration: "underline" }}
-            onClick={() => {
-              if (
-                window.location.hostname !== "web.koodoreader.com" &&
-                !isElectron
-              ) {
-                handleSetting(true);
-                handleSettingMode("account");
-                return;
-              }
-              navigate("/login");
-            }}
-          >
-            <Trans>Pro version</Trans>
-            <span> </span>
-          </span>
-
-          <span
-            className="icon-close icon-pro-close"
-            onClick={() => {
-              ConfigService.setReaderConfig("isHidePro", "yes");
-              setPartialState({ isHidePro: true });
-            }}
-          ></span>
-        </div>
-      ) : null}
-      {isAuthed &&
-      userInfo &&
-      ((userInfo.type === "pro" &&
-        userInfo.valid_until < new Date().getTime() / 1000 + 30 * 24 * 3600) ||
-        (userInfo.type === "trial" &&
-          userInfo.valid_until <
-            new Date().getTime() / 1000 + 3 * 24 * 3600)) ? (
-        <div className="header-report-container">
-          <span
-            data-tooltip-id="my-tooltip"
-            data-tooltip-content={i18n.t("Your trial will expire in", {
-              ttl: Math.ceil(
-                (userInfo.valid_until - new Date().getTime() / 1000) /
-                  (24 * 3600)
-              ),
-            })}
-          >
-            <span
-              style={{ textDecoration: "underline" }}
-              onClick={async () => {
-                let response = await getTempToken();
-                if (response.code === 200) {
-                  let tempToken = response.data.access_token;
-                  let deviceUuid = await TokenService.getFingerprint();
-                  openInBrowser(
-                    getWebsiteUrl() +
-                      getWebsiteLang() +
-                      "/pricing?temp_token=" +
-                      tempToken +
-                      "&device_uuid=" +
-                      deviceUuid
-                  );
-                } else if (response.code === 401) {
-                  handleFetchAuthed();
-                }
-              }}
-            >
-              <Trans>Renew Pro</Trans>
-            </span>
-          </span>
-        </div>
-      ) : null}
-      {isAuthed &&
-      userInfo &&
-      userInfo.type === "trial" &&
-      userInfo.valid_until > new Date().getTime() / 1000 + 3 * 24 * 3600 ? (
-        <div className="header-report-container" style={{ right: "200px" }}>
-          <span
-            data-tooltip-id="my-tooltip"
-            data-tooltip-content={i18n.t("Your trial will expire in", {
-              ttl: Math.ceil(
-                (userInfo.valid_until - new Date().getTime() / 1000) /
-                  (24 * 3600)
-              ),
-            })}
-          >
-            <span
-              style={{ textDecoration: "underline" }}
-              onClick={async () => {
-                let response = await getTempToken();
-                if (response.code === 200) {
-                  let tempToken = response.data.access_token;
-                  let deviceUuid = await TokenService.getFingerprint();
-                  openInBrowser(
-                    getWebsiteUrl() +
-                      getWebsiteLang() +
-                      "/pricing?temp_token=" +
-                      tempToken +
-                      "&device_uuid=" +
-                      deviceUuid
-                  );
-                } else if (response.code === 401) {
-                  handleFetchAuthed();
-                }
-              }}
-            >
-              <Trans>In trial</Trans>
-            </span>
-          </span>
-        </div>
-      ) : null}
-      {KookitConfig.CloudMode !== "production" ? (
-        <div className="header-report-container" style={{ right: "300px" }}>
-          <span
-            style={{
-              color: "red",
-              opacity: 1,
-              fontWeight: "bold",
-            }}
-          >
-            <Trans>TEST</Trans>
-            <span> </span>
-          </span>
-        </div>
-      ) : null}
 
       <ImportLocal
         {...({

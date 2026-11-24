@@ -25,6 +25,9 @@ const AboutSetting = () => {
 
   return (
     <>
+      <div className="setting-dialog-new-title" style={{ fontSize: 20, fontWeight: 700, color: "var(--md-sys-color-primary, #0061a4)", marginBottom: 12 }}>
+        T-Ebook
+      </div>
       <div className="setting-dialog-new-title">
         <Trans>Current version</Trans>
         <div style={{ display: "flex", alignItems: "center" }}>

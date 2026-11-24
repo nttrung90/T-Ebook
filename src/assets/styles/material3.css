@@ -1,0 +1,420 @@
+/*
+ * Material Design 3 skin.
+ *
+ * Color tokens live in public/assets/styles/theme.css so they load before the
+ * dynamically injected theme stylesheet. This file only maps the existing
+ * Koodo widgets onto M3 shape, type, state and elevation.
+ */
+
+:root {
+  --md-sys-typescale-font: Roboto, "Noto Sans", "Noto Sans CJK SC",
+    "Helvetica Neue", Arial, sans-serif;
+  --md-sys-shape-corner-xs: 4px;
+  --md-sys-shape-corner-sm: 8px;
+  --md-sys-shape-corner-md: 12px;
+  --md-sys-shape-corner-lg: 16px;
+  --md-sys-shape-corner-xl: 28px;
+  --md-sys-shape-corner-full: 9999px;
+  --md-sys-state-hover: 0.08;
+  --md-sys-state-focus: 0.1;
+  --md-sys-state-pressed: 0.1;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--md-sys-typescale-font);
+}
+
+body {
+  letter-spacing: 0.15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+ * Top app bar / header
+ * ------------------------------------------------------------------------ */
+.header {
+  background: var(--md-sys-color-surface);
+  box-shadow: none;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  height: 80px;
+}
+
+.sidebar {
+  background: var(--md-sys-color-surface-container-low);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.side-menu-item {
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+.side-menu-selector {
+  border-radius: var(--md-sys-shape-corner-full);
+  height: 40px;
+  margin: 0 8px;
+  width: calc(100% - 16px);
+}
+
+.side-menu-selector-container,
+.side-menu-hover-container {
+  border-radius: var(--md-sys-shape-corner-full);
+  height: 40px;
+  width: calc(100% - 16px);
+  left: 8px;
+}
+
+.side-menu-selector-container {
+  background: var(--md-sys-color-secondary-container) !important;
+}
+
+.side-menu-item.active .active-selector,
+.side-menu-item.active .active-icon {
+  color: var(--md-sys-color-on-secondary-container) !important;
+}
+
+.side-menu-item.active .side-menu-selector-container {
+  background: var(--md-sys-color-secondary-container) !important;
+}
+
+.side-menu-icon {
+  font-size: 22px;
+}
+
+.header-search-box {
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid transparent;
+  border-radius: var(--md-sys-shape-corner-full);
+  color: var(--md-sys-color-on-surface);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.header-search-box::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.header-search-box:focus {
+  background: var(--md-sys-color-surface-container-highest);
+  border-color: var(--md-sys-color-primary);
+}
+
+.header-search-text:hover {
+  background: transparent;
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+/* --------------------------------------------------------------------------
+ * Buttons, icon buttons, chips
+ * ------------------------------------------------------------------------ */
+.add-dialog-confirm,
+.delete-dialog-confirm,
+.edit-dialog-confirm,
+.token-dialog-confirm,
+.voice-add-confirm,
+.add-collection-dialog-confirm,
+.collection-dialog-confirm,
+.change-location-button,
+.download-desk-button,
+.new-version-open,
+.update-dialog-container-button,
+.import-from-local,
+.import-from-cloud,
+.backup-page-backup-selector,
+.book-bookmark-link,
+.message-box-container,
+.biometric-auth-button,
+.delete-digest-button,
+.book-item-config,
+.book-cover-item-config {
+  background: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary) !important;
+  border: none !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
+  box-shadow: none !important;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  transition:
+    filter 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.add-dialog-confirm:hover,
+.delete-dialog-confirm:hover,
+.edit-dialog-confirm:hover,
+.token-dialog-confirm:hover,
+.voice-add-confirm:hover,
+.import-from-local:hover,
+.import-from-cloud:hover {
+  filter: brightness(1.06);
+}
+
+.add-dialog-confirm:active,
+.delete-dialog-confirm:active,
+.edit-dialog-confirm:active,
+.token-dialog-confirm:active,
+.voice-add-confirm:active,
+.import-from-local:active,
+.import-from-cloud:active {
+  filter: brightness(0.92);
+}
+
+.add-dialog-cancel,
+.delete-dialog-cancel,
+.edit-dialog-cancel,
+.token-dialog-cancel,
+.voice-add-cancel,
+.add-collection-dialog-cancel,
+.collection-dialog-cancel,
+.tag-list-item,
+.tag-list-item-new,
+.input-value,
+.add-dialog-shelf-list-box,
+.add-dialog-new-shelf-box,
+.add-collection-dialog-list-box,
+.add-collection-dialog-new-box,
+.collection-dialog-input,
+.edit-dialog-book-name-box,
+.edit-dialog-book-author-box,
+.edit-dialog-input,
+.edit-dialog-textarea,
+.token-dialog-token-box,
+.token-dialog-url-box,
+.token-dialog-username-box,
+.token-dialog-password-box,
+.feedback-dialog-content-box,
+.voice-add-content-box,
+.general-setting-dropdown,
+.lang-setting-dropdown,
+.backup-source-dropdown {
+  border-radius: var(--md-sys-shape-corner-md) !important;
+  background: var(--md-sys-color-surface-container-highest) !important;
+  border: 1px solid var(--md-sys-color-outline) !important;
+  color: var(--md-sys-color-on-surface) !important;
+}
+
+.add-dialog-cancel,
+.delete-dialog-cancel,
+.edit-dialog-cancel,
+.token-dialog-cancel,
+.voice-add-cancel,
+.add-collection-dialog-cancel,
+.collection-dialog-cancel {
+  background: transparent !important;
+  border: 1px solid var(--md-sys-color-outline) !important;
+  color: var(--md-sys-color-primary) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
+}
+
+.setting-icon-container:hover,
+.sidebar-list-icon:hover,
+.header-search-text:hover,
+.nav-close-icon:hover,
+.setting-close-container:hover,
+.backup-page-close-icon:hover {
+  background: var(--hover-bg) !important;
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+.active-tag,
+.pin-dot.pin-dot-filled {
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary) !important;
+}
+
+/* --------------------------------------------------------------------------
+ * Dialogs, menus and panels
+ * ------------------------------------------------------------------------ */
+.action-dialog-container,
+.add-dialog-container,
+.collection-dialog-container,
+.collection-detail-dialog-container,
+.select-more-actions,
+.backup-page-container,
+.delete-dialog-container,
+.download-desk-container,
+.edit-dialog-container,
+.loading-dialog,
+.setting-dialog-container,
+.feedback-dialog-container,
+.token-dialog-container,
+.new-version,
+.sort-dialog-container,
+.popup-menu-box,
+.popup-color-box,
+.popup-box-container,
+.loading-page-cover {
+  background: var(--md-sys-color-surface-container-high) !important;
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-corner-xl) !important;
+  box-shadow: var(--md-sys-elevation-3) !important;
+}
+
+.popup-menu-box,
+.popup-color-box {
+  border-radius: var(--md-sys-shape-corner-md) !important;
+}
+
+.setting-dialog-sidebar {
+  border-right: 1px solid var(--md-sys-color-outline-variant) !important;
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.setting-dialog-sidebar-item {
+  border-radius: var(--md-sys-shape-corner-full);
+  opacity: 0.78;
+}
+
+.setting-dialog-sidebar-item.active {
+  background: var(--md-sys-color-secondary-container) !important;
+  color: var(--md-sys-color-on-secondary-container) !important;
+  opacity: 1;
+}
+
+.navigation-panel,
+.book-operation-panel,
+.progress-panel,
+.setting-panel-parent {
+  background: var(--md-sys-color-surface-container-high) !important;
+  box-shadow: var(--md-sys-elevation-2);
+}
+
+/* --------------------------------------------------------------------------
+ * Lists, cards and covers
+ * ------------------------------------------------------------------------ */
+.book-item-cover,
+.book-item-image,
+.book-cover,
+.detail-cover,
+.book-cover-item-cover,
+.card-list-item-card {
+  border-radius: var(--md-sys-shape-corner-md) !important;
+}
+
+.card-list-item-card {
+  background: var(--md-sys-color-surface-container-low) !important;
+  border: 1px solid var(--md-sys-color-outline-variant) !important;
+}
+
+.book-list-item {
+  border-radius: var(--md-sys-shape-corner-md);
+}
+
+.book-list-item:hover {
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.book-content-name {
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+/* --------------------------------------------------------------------------
+ * Inputs and range sliders
+ * ------------------------------------------------------------------------ */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea {
+  border-radius: var(--md-sys-shape-corner-sm);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+input[type="range"] {
+  accent-color: var(--md-sys-color-primary);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  border: none !important;
+  background: var(--md-sys-color-primary) !important;
+  width: 18px !important;
+  height: 18px !important;
+  bottom: 8px !important;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  border-bottom: 2px solid var(--md-sys-color-outline-variant) !important;
+}
+
+/* --------------------------------------------------------------------------
+ * Switches
+ * ------------------------------------------------------------------------ */
+.single-control-switch {
+  background: var(--md-sys-color-surface-container-highest) !important;
+  border: 2px solid var(--md-sys-color-outline) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
+  width: 44px;
+  height: 24px;
+  box-sizing: border-box;
+}
+
+.single-control-switch .single-control-button {
+  width: 16px;
+  height: 16px;
+  margin: 2px;
+  background: var(--md-sys-color-outline) !important;
+}
+
+/* Enabled switches keep the primary accent from theme.css. */
+.single-control-switch[style*="opacity: 1"] {
+  background: var(--md-sys-color-primary) !important;
+  border-color: var(--md-sys-color-primary) !important;
+}
+
+.single-control-switch[style*="opacity: 1"] .single-control-button {
+  background: var(--md-sys-color-on-primary) !important;
+}
+
+/* --------------------------------------------------------------------------
+ * Reader chrome
+ * ------------------------------------------------------------------------ */
+.reader-setting-icon,
+.reader-setting-icon-container,
+.add-bookmark-button,
+.exit-reading-button,
+.enter-fullscreen-button,
+.navigation-header {
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+.navigation-header {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+
+.reader-quick-buttons {
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+/* Scrollbars: thin M3 style. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

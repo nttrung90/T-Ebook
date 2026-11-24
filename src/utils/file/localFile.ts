@@ -3,6 +3,7 @@ import DatabaseService from "../storage/databaseService";
 import Book from "../../models/Book";
 import CoverUtil from "./coverUtil";
 import BookUtil from "./bookUtil";
+import { Capacitor } from "@capacitor/core";
 
 declare global {
   interface FileSystemDirectoryHandle {
@@ -68,13 +69,16 @@ export class LocalFileManager {
 
   // 检查浏览器是否支持 File System Access API
   static isSupported(): boolean {
+    if (Capacitor.isNativePlatform()) {
+      return false;
+    }
     return "showDirectoryPicker" in window;
   }
 
   // 请求目录访问权限
   static async requestDirectoryAccess(): Promise<FileSystemDirectoryHandle | null> {
     try {
-      if (!this.isSupported()) {
+      if (Capacitor.isNativePlatform() || !this.isSupported()) {
         throw new Error("File System Access API not supported");
       }
 
@@ -99,6 +103,9 @@ export class LocalFileManager {
     needsReauthorization: boolean;
     directoryName?: string;
   }> {
+    if (Capacitor.isNativePlatform()) {
+      return { hasAccess: false, needsReauthorization: false };
+    }
     try {
       const storedHandle = await this.retrieveDirectoryHandle();
 

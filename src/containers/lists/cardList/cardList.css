@@ -213,3 +213,20 @@
   border-top: 1px solid #e0e0e0;
   opacity: 0.6;
 }
+
+@media screen and (max-width: 768px) {
+  .card-list-container-parent {
+    left: var(--sidebar-w, 175px) !important;
+    top: 60px !important;
+    width: calc(100% - var(--sidebar-w, 175px)) !important;
+    height: calc(100% - 60px) !important;
+    padding: 10px 12px !important;
+    box-sizing: border-box !important;
+    transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .card-list-item {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+}

@@ -17,6 +17,7 @@ import {
 
 import toast from "react-hot-toast";
 import { isElectron } from "react-device-detect";
+import { Capacitor } from "@capacitor/core";
 import { LocalFileManager } from "../../../utils/file/localFile";
 import {
   ConfigService,
@@ -115,7 +116,7 @@ const DataSetting = () => {
 
   useEffect(() => {
     const init = async () => {
-      if (!isElectron) {
+      if (!isElectron && !Capacitor.isNativePlatform()) {
         const status = await LocalFileManager.getPermissionStatus();
         setState({
           storageLocation: status.directoryName || "",

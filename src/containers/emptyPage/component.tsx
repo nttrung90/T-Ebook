@@ -28,12 +28,14 @@ const EmptyPage = () => {
       );
     });
   };
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
   return (
     <>
       <div
         className="empty-page-container"
         style={
-          isCollapsed
+          isCollapsed && !isMobile
             ? { width: "calc(100vw - 100px)", left: "100px" }
             : {}
         }

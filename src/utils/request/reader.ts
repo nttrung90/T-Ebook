@@ -229,36 +229,8 @@ export const getTTSAudio = async (
           quotaAlertDismissTime = Date.now();
         }
       } else {
-        let result = await vexComfirmAsync(
-          i18n.t(
-            "Please upgrade to Pro to unlock more daily free quota or wait until the quota resets. You can also use other TTS voices instead."
-          ) +
-            " " +
-            (response.data && response.data.ttl
-              ? i18n.t("Your quota will be reset in", {
-                  ttl: (response.data.ttl / 3600).toFixed(1),
-                })
-              : ""),
-          "Upgrade to Pro"
-        );
-        if (result) {
-          isShowingQuotaAlert = false;
-          quotaAlertDismissTime = Date.now();
-          let response = await getTempToken();
-          if (response.code === 200) {
-            let tempToken = response.data.access_token;
-            let deviceUuid = await TokenService.getFingerprint();
-            openInBrowser(
-              getWebsiteUrl() + getWebsiteLang() + "/pricing?temp_token=" +
-                tempToken +
-                "&device_uuid=" +
-                deviceUuid
-            );
-          }
-        } else {
-          isShowingQuotaAlert = false;
-          quotaAlertDismissTime = Date.now();
-        }
+        isShowingQuotaAlert = false;
+        quotaAlertDismissTime = Date.now();
       }
     }
     return response;

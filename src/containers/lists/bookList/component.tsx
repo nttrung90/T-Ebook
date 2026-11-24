@@ -533,11 +533,16 @@ const BookList = () => {
     return <Navigate to="/manager/empty" replace />;
   }
   const { books: displayedBookList, bookMode } = handleBooks();
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
   return (
     <>
       <div
         className="book-list-header"
-        style={isCollapsed ? { width: "calc(100% - 70px)", left: "70px" } : {}}
+        style={
+          isCollapsed && !isMobile
+            ? { width: "calc(100% - 70px)", left: "70px" }
+            : {}
+        }
       >
         <SelectBook />
 
@@ -597,7 +602,11 @@ const BookList = () => {
       </div>
       <div
         className="book-list-container-parent"
-        style={isCollapsed ? { width: "calc(100vw - 70px)", left: "70px" } : {}}
+        style={
+          isCollapsed && !isMobile
+            ? { width: "calc(100vw - 70px)", left: "70px" }
+            : {}
+        }
       >
         <div className="book-list-container">
           <ul

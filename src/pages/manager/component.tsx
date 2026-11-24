@@ -48,6 +48,7 @@ export interface ManagerState {
 
 const Manager = () => {
   const books = useAppStore((s) => s.manager.books);
+  const isCollapsed = useAppStore((s) => s.sidebar.isCollapsed);
   const isShowPopupNote = useAppStore((s) => s.manager.isShowPopupNote);
   const importBookFunc = useAppStore((s) => s.book.importBookFunc);
   const cloudSyncFunc = useAppStore((s) => s.book.cloudSyncFunc);
@@ -218,7 +219,7 @@ const Manager = () => {
   };
   return (
     <div
-      className="manager"
+      className={`manager ${isCollapsed ? "sidebar-collapsed" : ""}`}
       onDragEnter={(e) => {
         if (isExternalFileDragEvent(e)) {
           handleDrag(true);

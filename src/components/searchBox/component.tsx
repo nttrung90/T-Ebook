@@ -35,8 +35,7 @@ const SearchBox = (props: SearchBoxProps) => {
 
   useEffect(() => {
     if (props.isNavSearch) {
-      let searchBox: any = document.querySelector(".header-search-box");
-      searchBox && searchBox.focus();
+      searchBoxRef.current?.focus();
     }
   }, []);
 
@@ -98,9 +97,7 @@ const SearchBox = (props: SearchBoxProps) => {
     if (props.mode === "nav") {
       props.handleNavSearchState?.("searching");
     }
-    let keyword = (
-      document.querySelector(".header-search-box") as HTMLInputElement
-    ).value.toLowerCase();
+    let keyword = (searchBoxRef.current?.value || "").toLowerCase();
     let results = await handleGetSearchResults(keyword);
     if (results) {
       handleSearchResults(results);
@@ -139,8 +136,9 @@ const SearchBox = (props: SearchBoxProps) => {
       props.handleNavSearchState?.("done");
     }
     handleSearch(false);
-    (document.querySelector(".header-search-box") as HTMLInputElement).value =
-      "";
+    if (searchBoxRef.current) {
+      searchBoxRef.current.value = "";
+    }
   };
 
   return (

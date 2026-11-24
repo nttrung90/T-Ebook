@@ -61,11 +61,12 @@ const NoteList = () => {
     mode: tabMode,
     bookNamesMap: bookNamesMap,
   };
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
   return (
     <div
       className="note-list-container-parent"
       style={
-        isCollapsed
+        isCollapsed && !isMobile
           ? { width: "calc(100vw - 70px)", left: "70px" }
           : {}
       }

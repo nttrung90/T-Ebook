@@ -187,18 +187,21 @@ const CardList = (props: CardListProps) => {
 
   const renderCardListItem = (notes: any[]) => {
     return notes.map((item: NoteModel, index: number) => {
+      const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
       return (
         <li
           className="card-list-item"
           key={index}
           style={
-            props.mode === "note" && !isCollapsed
-              ? { height: "250px" }
-              : props.mode === "note" && isCollapsed
-                ? { height: "250px", width: "calc(50vw - 70px)" }
-                : isCollapsed
-                  ? { width: "calc(50vw - 70px)" }
-                  : {}
+            isMobile
+              ? { width: "100%", height: props.mode === "note" ? "auto" : undefined }
+              : props.mode === "note" && !isCollapsed
+                ? { height: "250px" }
+                : props.mode === "note" && isCollapsed
+                  ? { height: "250px", width: "calc(50vw - 70px)" }
+                  : isCollapsed
+                    ? { width: "calc(50vw - 70px)" }
+                    : {}
           }
         >
           <div className="card-list-item-card">

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material Design 3 baseline blue palette (dark). -->
+    <color name="md_theme_primary">#9ECAFF</color>
+    <color name="md_theme_onPrimary">#003258</color>
+    <color name="md_theme_primaryContainer">#00497D</color>
+    <color name="md_theme_onPrimaryContainer">#D1E4FF</color>
+    <color name="md_theme_secondary">#BBC7DB</color>
+    <color name="md_theme_onSecondary">#253140</color>
+    <color name="md_theme_secondaryContainer">#3B4858</color>
+    <color name="md_theme_onSecondaryContainer">#D7E3F7</color>
+    <color name="md_theme_tertiary">#D6BEE4</color>
+    <color name="md_theme_onTertiary">#3B2948</color>
+    <color name="md_theme_tertiaryContainer">#523F5F</color>
+    <color name="md_theme_onTertiaryContainer">#F2DAFF</color>
+    <color name="md_theme_error">#FFB4AB</color>
+    <color name="md_theme_onError">#690005</color>
+    <color name="md_theme_surface">#141218</color>
+    <color name="md_theme_onSurface">#E6E0E9</color>
+    <color name="md_theme_surfaceVariant">#49454F</color>
+    <color name="md_theme_onSurfaceVariant">#CAC4D0</color>
+    <color name="md_theme_outline">#938F99</color>
+    <color name="md_theme_outlineVariant">#49454F</color>
+    <color name="md_theme_inverseSurface">#E6E0E9</color>
+    <color name="md_theme_inverseOnSurface">#322F35</color>
+    <color name="md_theme_scrim">#000000</color>
+
+    <color name="colorPrimary">@color/md_theme_primary</color>
+    <color name="colorPrimaryDark">@color/md_theme_onPrimaryContainer</color>
+    <color name="colorAccent">@color/md_theme_tertiary</color>
+    <color name="splashBackground">@color/md_theme_surface</color>
+</resources>

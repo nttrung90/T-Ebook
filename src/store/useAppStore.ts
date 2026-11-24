@@ -603,11 +603,12 @@ export const useAppStore = create<AppState>()((set, get) => {
           }
         }
       }
+      // Disable expired support popup
       if (
         userInfo &&
         userInfo.valid_until < parseInt(new Date().getTime() / 1000 + "")
       ) {
-        get().handleShowSupport(true);
+        // no-op
       }
       if (userInfo && userInfo.valid_until && userInfo.token_valid_until) {
         if (

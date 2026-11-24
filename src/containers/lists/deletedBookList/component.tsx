@@ -129,13 +129,15 @@ const BookList = () => {
     });
   };
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
   return (
     <>
       {fullBooksData.length > 0 ? (
         <div
           className="book-list-container-parent"
           style={
-            isCollapsed
+            isCollapsed && !isMobile
               ? { width: "calc(100vw - 70px)", left: "70px" }
               : {}
           }
@@ -158,7 +160,7 @@ const BookList = () => {
         <div
           className="book-list-header"
           style={
-            isCollapsed
+            isCollapsed && !isMobile
               ? { width: "calc(100% - 70px)", left: "70px" }
               : {}
           }
@@ -169,7 +171,7 @@ const BookList = () => {
             onClick={() => {
               handleDeleteDialog(true);
             }}
-            style={isCollapsed ? { left: "calc(50% - 60px)" } : {}}
+            style={isCollapsed && !isMobile ? { left: "calc(50% - 60px)" } : {}}
           >
             <Trans>Delete all books</Trans>
           </div>

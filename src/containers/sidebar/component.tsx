@@ -4,13 +4,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./sidebar.css";
 import { sideMenu } from "../../constants/sideMenu";
 import { ConfigService } from "../../assets/lib/kookit-extra-browser.min";
-import { getWebsiteUrl, openInBrowser } from "../../utils/common";
+import { openInBrowser } from "../../utils/common";
 import { Trans } from "react-i18next";
 import toast from "react-hot-toast";
-import logoDark from "../../assets/images/logo-dark.png";
-import logoDarkPro from "../../assets/images/logo-dark-pro.png";
-import logoLight from "../../assets/images/logo-light.png";
-import logoLightPro from "../../assets/images/logo-light-pro.png";
 import {
   addBooksToFavorite,
   addBooksToShelf,
@@ -400,7 +396,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className="sidebar">
+      <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
         <div
           className="sidebar-list-icon"
           onClick={() => {
@@ -410,25 +406,15 @@ const Sidebar = () => {
           <span className="icon-menu sidebar-list"></span>
         </div>
 
-        <img
-          src={
-            ConfigService.getReaderConfig("appSkin") === "night" ||
-            (ConfigService.getReaderConfig("appSkin") === "system" &&
-              ConfigService.getReaderConfig("isOSNight") === "yes")
-              ? isAuthed
-                ? logoDarkPro
-                : logoDark
-              : isAuthed
-              ? logoLightPro
-              : logoLight
-          }
-          alt=""
+        <div
+          className="logo-container"
           onClick={() => {
-            handleJump(getWebsiteUrl());
+            navigate("/manager/home");
           }}
           style={isCollapsed ? { display: "none" } : {}}
-          className="logo"
-        />
+        >
+          <span className="logo-text">T-Ebook</span>
+        </div>
         <div
           className="side-menu-container-parent"
           style={isCollapsed ? { width: "70px" } : {}}

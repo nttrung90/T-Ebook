@@ -255,7 +255,7 @@ const Login = () => {
             </div>
             <div className="login-subtitle">
               {t(
-                "After three years of design and development, the mobile version of Koodo Reader is finally out"
+                "After three years of design and development, the mobile version of T-Ebook is finally out"
               )}
             </div>
             <div
@@ -363,9 +363,7 @@ const Login = () => {
               className="login-title"
               style={{ marginTop: "50px", marginBottom: "30px" }}
             >
-              {t(
-                "Embark on your journey of exploration with Koodo Reader Pro"
-              )}
+              T-Ebook
             </div>
             <div className="login-option-box">
               <div>
@@ -443,27 +441,6 @@ const Login = () => {
                     </div>
                   );
                 })}
-                <div className="login-billing-info">
-                  {t(
-                    "7-day free trial upon registration, then billed $4.99 per Year"
-                  )}
-                </div>
-                <div
-                  className="login-billing-info"
-                  style={{
-                    marginTop: "-25px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                  }}
-                  onClick={() => {
-                    openInBrowser(
-                      getWebsiteUrl() + getWebsiteLang() + "/pricing"
-                    );
-                  }}
-                >
-                  {t("Compare Free and Pro features")}
-                </div>
                 <div
                   className="login-manual-token"
                   onClick={() => {
@@ -475,7 +452,7 @@ const Login = () => {
                 </div>
                 <div className="login-term">
                   {t(
-                    "By clicking continue, you acknowledge that you have carefully read and agree to accept Koodo Reader's Terms of Service and Privacy Policy"
+                    "By clicking continue, you acknowledge that you have carefully read and agree to accept T-Ebook's Terms of Service and Privacy Policy"
                   )}
                 </div>
               </div>
@@ -691,9 +668,7 @@ const Login = () => {
               className="login-title"
               style={{ marginTop: "80px", marginBottom: "50px" }}
             >
-              {t(
-                "Embark on your journey of exploration with Koodo Reader Pro"
-              )}
+              T-Ebook
             </div>
             <div className="login-option-box">
               <div>
