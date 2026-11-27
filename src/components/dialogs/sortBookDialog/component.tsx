@@ -4,7 +4,7 @@ import { Trans } from "react-i18next";
 import { useAppStore } from "../../../store/useAppStore";
 import { ConfigService } from "../../../assets/lib/kookit-extra-browser.min";
 
-const SortDialog = () => {
+const SortDialog = ({ dismissOnHover = true }: { dismissOnHover?: boolean }) => {
   const bookSortCode = useAppStore((s) => s.manager.bookSortCode);
   const noteSortCode = useAppStore((s) => s.manager.noteSortCode);
   const mode = useAppStore((s) => s.sidebar.mode);
@@ -62,12 +62,8 @@ const SortDialog = () => {
   return (
     <div
       className="sort-dialog-container"
-      onMouseLeave={() => {
-        handleSortDisplay(false);
-      }}
-      onMouseEnter={() => {
-        handleSortDisplay(true);
-      }}
+      onMouseLeave={dismissOnHover ? () => handleSortDisplay(false) : undefined}
+      onMouseEnter={dismissOnHover ? () => handleSortDisplay(true) : undefined}
       style={isNote ? { height: "132px" } : {}}
     >
       {isNote ? (

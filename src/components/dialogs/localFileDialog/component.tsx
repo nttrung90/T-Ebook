@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./localFileDialog.css";
-import { Trans } from "react-i18next";
 import { useAppStore } from "../../../store/useAppStore";
 import LazyLottie from "../../lazyLottie";
 import toast from "react-hot-toast";
@@ -90,50 +89,46 @@ const LocalFileDialog = () => {
 
   return (
     <div
-      className="backup-page-container"
-      style={{ height: "300px", top: "calc(50% - 150px)" }}
+      className="backup-page-container local-file-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("Never lose your data")}
     >
-      <div className="add-dialog-title">
-        <Trans>Never lose your data</Trans>
-      </div>
+      <div className="local-file-dialog-title">{t("Never lose your data")}</div>
       {!isFinish ? (
-        <div className="backup-page-option" style={{ bottom: "0px", top: "0px" }}>
-          <div className="backup-page-finish">
-            <LazyLottie
-              animation="safe"
-              loop={false}
-              style={{ height: 120, width: "100%" }}
-            />
-            <div className="backup-page-warning-text">
-              {status.needsReauthorization ? (
-                t("Need to reauthorize the access to directory") +
+        <>
+          <LazyLottie
+            animation="safe"
+            loop={false}
+            style={{ height: 120, width: "100%", flexShrink: 0 }}
+          />
+          <div className="backup-page-warning-text">
+            {status.needsReauthorization
+              ? t("Need to reauthorize the access to directory") +
                 " " +
                 status.directoryName +
                 ", " +
                 t(
                   "Please click the allow on every visit button to avoid this popup once and for all"
                 )
-              ) : (
-                <Trans>
-                  Grant access to local folder to save your data and reduce the
-                  risk of data loss
-                </Trans>
-              )}
-            </div>
+              : t(
+                  "Grant access to local folder to save your data and reduce the risk of data loss"
+                )}
           </div>
-          <div className="add-dialog-button-container">
-            <div
+          <div className="local-file-dialog-actions">
+            <button
+              type="button"
               className="add-dialog-cancel"
-              style={{ borderWidth: 0, marginRight: "20px" }}
               onClick={() => {
                 ConfigService.setItem("isUseLocal", "no");
                 handleClose();
               }}
             >
-              <Trans>Continue to store in the browser</Trans>
-            </div>
+              {t("Continue to store in the browser")}
+            </button>
             {status.needsReauthorization ? (
-              <div
+              <button
+                type="button"
                 className="add-dialog-confirm"
                 onClick={async () => {
                   await LocalFileManager.ensureDirectoryAccess();
@@ -145,42 +140,37 @@ const LocalFileDialog = () => {
                   }, 2000);
                 }}
               >
-                <Trans>Authorize</Trans>
-              </div>
+                {t("Authorize")}
+              </button>
             ) : (
-              <div
+              <button
+                type="button"
                 className="add-dialog-confirm"
-                onClick={() => {
-                  handleSelectFolder();
-                }}
+                onClick={handleSelectFolder}
               >
-                <Trans>Select folder</Trans>
-              </div>
+                {t("Select folder")}
+              </button>
             )}
           </div>
-        </div>
+        </>
       ) : (
-        <div className="backup-page-finish-container">
-          <div className="backup-page-finish">
-            <LazyLottie
-              animation="success"
-              loop={false}
-              style={{ height: 80, width: "100%" }}
-            />
-            <div className="backup-page-finish-text">
-              <Trans>Setup successful</Trans>
-            </div>
-          </div>
+        <div className="local-file-dialog-result">
+          <LazyLottie
+            animation="success"
+            loop={false}
+            style={{ height: 80, width: "100%" }}
+          />
+          <div>{t("Setup successful")}</div>
         </div>
       )}
-      <div
+      <button
+        type="button"
         className="backup-page-close-icon"
-        onClick={() => {
-          handleClose();
-        }}
+        aria-label={t("Close")}
+        onClick={handleClose}
       >
-        <span className="icon-close backup-close-icon"></span>
-      </div>
+        <span className="icon-close" aria-hidden="true" />
+      </button>
     </div>
   );
 };

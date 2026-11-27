@@ -1,8 +1,72 @@
+.backup-page-container.local-file-dialog {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(454px, calc(100% - 24px));
+  height: fit-content;
+  max-height: calc(100% - 24px);
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 12px;
+  overflow: auto;
+  z-index: 1041;
+}
+
+.local-file-dialog-title {
+  padding: 0 32px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+}
+
 .backup-page-warning-text {
   font-size: 15px;
   line-height: 1.25;
-  margin-top: 12px;
-  padding-left: 20px;
-  padding-right: 20px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.local-file-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.local-file-dialog-actions button {
+  min-height: 44px;
+  height: auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.local-file-dialog .backup-page-close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  font-size: 18px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.local-file-dialog-result {
+  font-size: 18px;
+  line-height: 1.4;
   text-align: center;
 }

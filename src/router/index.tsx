@@ -4,9 +4,11 @@ import { changeLanguage } from "../i18n";
 import { ConfigService } from "../assets/lib/kookit-extra-browser.min";
 import Manager from "../pages/manager";
 import Login from "../pages/login";
+import NotFound from "../pages/notFound";
 import Stats from "../pages/stats";
 import HtmlReader from "../pages/reader";
 import _Redirect from "../pages/redirect";
+import AndroidBackHandler from "../components/androidBackHandler";
 
 const Router = () => {
   useEffect(() => {
@@ -144,6 +146,7 @@ const Router = () => {
   }, []);
   return (
     <HashRouter>
+      <AndroidBackHandler />
       <Routes>
         <Route element={<Manager />} path="/manager/*" />
         <Route element={<Login />} path="/login" />
@@ -178,6 +181,7 @@ const Router = () => {
         <Route element={<HtmlReader />} path="/href/*" />
         <Route element={<HtmlReader />} path="/pdf/*" />
         <Route element={<_Redirect />} path="/" />
+        <Route element={<NotFound />} path="*" />
       </Routes>
     </HashRouter>
   );

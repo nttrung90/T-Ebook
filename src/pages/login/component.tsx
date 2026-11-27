@@ -46,7 +46,7 @@ import { useAppStore } from "../../store/useAppStore";
 
 export interface LoginState {
   currentStep: number;
-  loginConfig: any;
+  loginConfig: { email: string; token: string };
   isSendingCode: boolean;
   countdown: number;
   serverRegion: string;
@@ -89,7 +89,7 @@ const Login = () => {
   const propsRef = useLatest(currentProps);
   const [state, setState] = useState<LoginState>({
     currentStep: 0,
-    loginConfig: {},
+    loginConfig: { email: "", token: "" },
     countdown: 0,
     isSendingCode: false,
     serverRegion: getServerRegion(),
@@ -212,14 +212,19 @@ const Login = () => {
           },
         }}
       />
-      <div
+      <button
+        type="button"
         className="login-close-container"
+        aria-label={t("Close")}
         onClick={() => {
           navigate("/manager/home");
         }}
       >
-        <span className="icon-close login-close-icon theme-color-delete"></span>
-      </div>
+        <span
+          className="icon-close login-close-icon theme-color-delete"
+          aria-hidden="true"
+        ></span>
+      </button>
       {isSettingOpen && <SettingDialog />}
       {isShowLoading && <LoadingDialog />}
       {state.currentStep === 0 && (
@@ -258,7 +263,8 @@ const Login = () => {
                 "After three years of design and development, the mobile version of T-Ebook is finally out"
               )}
             </div>
-            <div
+            <button
+              type="button"
               className="login-next-button"
               onClick={() => {
                 updateState({
@@ -267,7 +273,7 @@ const Login = () => {
               }}
             >
               {t("Next step")}
-            </div>
+            </button>
           </div>
         </div>
       )}
@@ -310,22 +316,20 @@ const Login = () => {
                 "With the integration of popular cloud storage services, WebDAV, FTP, SFTP, SMB, Docker, and object storage, all your data remains securely in your control"
               )}
             </div>
-            <div>
-              <div
-                className="login-next-button"
+            <div className="login-actions">
+              <button
+                type="button"
+                className="login-next-button login-secondary-button"
                 onClick={() => {
                   updateState({
                     currentStep: 0,
                   });
                 }}
-                style={{
-                  borderWidth: "0px",
-                  right: "140px",
-                }}
               >
                 {t("Last step")}
-              </div>
-              <div
+              </button>
+              <button
+                type="button"
                 className="login-next-button"
                 onClick={() => {
                   updateState({
@@ -334,7 +338,7 @@ const Login = () => {
                 }}
               >
                 {t("Next step")}
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -371,40 +375,40 @@ const Login = () => {
                   <div className="login-region-title">
                     {t("Server region")}
                   </div>
-                  <div>
-                    <span
+                  <div
+                    className="login-region-options"
+                    role="group"
+                    aria-label={t("Server region")}
+                  >
+                    <button
+                      type="button"
+                      className="login-region-option"
+                      aria-pressed={state.serverRegion === "global"}
                       onClick={() => {
                         handleServerRegionChange("global");
                       }}
-                      style={
-                        state.serverRegion === "global"
-                          ? { textDecoration: "underline" }
-                          : {}
-                      }
                     >
                       {t("Global")}
-                    </span>
-                    <span>{" | "}</span>
-                    <span
+                    </button>
+                    <span aria-hidden="true">|</span>
+                    <button
+                      type="button"
+                      className="login-region-option"
+                      aria-pressed={state.serverRegion === "china"}
                       onClick={() => {
                         handleServerRegionChange("china");
                       }}
-                      style={
-                        state.serverRegion === "china"
-                          ? { textDecoration: "underline" }
-                          : {}
-                      }
                     >
                       {t("China")}
-                    </span>
+                    </button>
                   </div>
                 </div>
                 {loginList.map((item) => {
                   return (
-                    <div
+                    <button
+                      type="button"
                       className="login-option-container"
                       key={item.value}
-                      style={{}}
                       onClick={() => {
                         if (item.value === "email") {
                           updateState({ currentStep: 5 });
@@ -427,21 +431,21 @@ const Login = () => {
                         }
                       }}
                     >
-                      <div className="login-option-icon">
-                        <span
-                          className={item.icon + " login-option-icon"}
-                          style={{ fontSize: item.fontsize }}
-                        ></span>
-                      </div>
-                      <div className="login-option-title">
+                      <span
+                        aria-hidden="true"
+                        className={item.icon + " login-option-icon"}
+                        style={{ fontSize: item.fontsize }}
+                      ></span>
+                      <span className="login-option-title">
                         <Trans i18nKey="Continue with" label={item.label}>
                           Continue with {{ label: t(item.label) }}
                         </Trans>
-                      </div>
-                    </div>
+                      </span>
+                    </button>
                   );
                 })}
-                <div
+                <button
+                  type="button"
                   className="login-manual-token"
                   onClick={() => {
                     handleSetting(true);
@@ -449,7 +453,7 @@ const Login = () => {
                   }}
                 >
                   {t("Manually enter login credentials")}
-                </div>
+                </button>
                 <div className="login-term">
                   {t(
                     "By clicking continue, you acknowledge that you have carefully read and agree to accept T-Ebook's Terms of Service and Privacy Policy"
@@ -568,21 +572,17 @@ const Login = () => {
                   );
                 })}
             </div>
-            <div
-              className="login-next-button"
+            <button
+              type="button"
+              className="login-next-button login-secondary-button"
               onClick={() => {
                 updateState({
                   currentStep: 4,
                 });
               }}
-              style={{
-                borderWidth: "0px",
-                right: "0px",
-                // bottom: "10px",
-              }}
             >
               {t("Skip")}
-            </div>
+            </button>
           </div>
         </div>
       )}
@@ -629,18 +629,15 @@ const Login = () => {
                 }}
               />
             </div>
-            <div
-              className="login-next-button"
+            <button
+              type="button"
+              className="login-next-button login-secondary-button"
               onClick={() => {
                 navigate("/manager/home");
               }}
-              style={{
-                borderWidth: "0px",
-                right: "0px",
-              }}
             >
               {t("Finish")}
-            </div>
+            </button>
           </div>
         </div>
       )}
@@ -673,19 +670,18 @@ const Login = () => {
             <div className="login-option-box">
               <div>
                 <input
-                  type={"text"}
-                  name={"email"}
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  aria-label={t("Enter your email")}
                   placeholder={t("Enter your email")}
+                  value={state.loginConfig.email}
                   onChange={(e) => {
-                    if (e.target.value) {
-                      setState((prevState) => ({
-                        ...prevState,
-                        loginConfig: {
-                          ...prevState.loginConfig,
-                          ["email"]: e.target.value.trim(),
-                        },
-                      }));
-                    }
+                    const email = e.target.value.trim();
+                    setState((prevState) => ({
+                      ...prevState,
+                      loginConfig: { ...prevState.loginConfig, email },
+                    }));
                   }}
                   onContextMenu={() => {
                     handleContextMenu("token-dialog-email-box", true);
@@ -702,23 +698,21 @@ const Login = () => {
                   }}
                   id={"token-dialog-email-box"}
                   className="login-input-container"
-                  style={{}}
                 />
-                <div style={{ position: "relative" }}>
+                <div className="login-code-row">
                   <input
-                    type={"text"}
-                    name={"code"}
+                    type="text"
+                    name="code"
+                    autoComplete="one-time-code"
+                    aria-label={t("Enter code")}
                     placeholder={t("Enter code")}
+                    value={state.loginConfig.token}
                     onChange={(e) => {
-                      if (e.target.value) {
-                        setState((prevState) => ({
-                          ...prevState,
-                          loginConfig: {
-                            ...prevState.loginConfig,
-                            ["token"]: e.target.value.trim(),
-                          },
-                        }));
-                      }
+                      const token = e.target.value.trim();
+                      setState((prevState) => ({
+                        ...prevState,
+                        loginConfig: { ...prevState.loginConfig, token },
+                      }));
                     }}
                     onContextMenu={() => {
                       handleContextMenu("token-dialog-token-box", true);
@@ -727,8 +721,10 @@ const Login = () => {
                     className="login-input-container"
                   />
 
-                  <div
-                    className="login-manual-token"
+                  <button
+                    type="button"
+                    className="login-manual-token login-send-code"
+                    disabled={state.isSendingCode || state.countdown > 0}
                     onClick={async () => {
                       if (!stateRef.current.loginConfig.email) {
                         toast.error(propsRef.current.t("Enter your email"));
@@ -789,14 +785,6 @@ const Login = () => {
                         );
                       }
                     }}
-                    style={{
-                      position: "absolute",
-                      right: "30px",
-                      top: "30px",
-                      textAlign: "right",
-                      cursor: "pointer",
-                      fontSize: "15px",
-                    }}
                   >
                     {state.countdown ? (
                       state.countdown + "s"
@@ -805,11 +793,12 @@ const Login = () => {
                     ) : (
                       <Trans>Send code</Trans>
                     )}
-                  </div>
+                  </button>
                 </div>
 
-                <div
-                  className="login-manual-token"
+                <button
+                  type="button"
+                  className="login-manual-token login-submit"
                   onClick={async () => {
                     if (
                       !stateRef.current.loginConfig.token ||
@@ -838,12 +827,9 @@ const Login = () => {
                       "email"
                     );
                   }}
-                  style={{
-                    margin: "10px",
-                  }}
                 >
                   {t("Continue")}
-                </div>
+                </button>
                 <div className="login-term">
                   {t(
                     "7-days free trial only applies to users who registered with recommended email providers. Recommended email providers are as follows"
@@ -851,20 +837,17 @@ const Login = () => {
                   <br />
                   {CommonTool.EmailProviders.join(", ")}
                 </div>
-                <div
-                  className="login-next-button"
+                <button
+                  type="button"
+                  className="login-next-button login-secondary-button"
                   onClick={() => {
                     updateState({
                       currentStep: 2,
                     });
                   }}
-                  style={{
-                    borderWidth: "0px",
-                    right: "0px",
-                  }}
                 >
                   {t("Back")}
-                </div>
+                </button>
               </div>
             </div>
           </div>

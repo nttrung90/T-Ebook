@@ -13,7 +13,9 @@ import {
   applyAppBackgroundImage,
 } from "./utils/reader/launchUtil";
 import { initExternalLinkGuard, migrateConfig } from "./utils/common";
+import { initAndroidRuntime } from "./utils/androidRuntime";
 initTheme();
+initAndroidRuntime();
 initSystemFont();
 migrateConfig();
 initExternalLinkGuard();

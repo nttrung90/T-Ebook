@@ -42,6 +42,9 @@
   left: 0px;
   z-index: 9;
 }
+.drag-background.manager-dialog-backdrop {
+  z-index: 1040;
+}
 .drag-info {
   position: absolute;
   top: 50%;

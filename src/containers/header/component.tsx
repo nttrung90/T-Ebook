@@ -50,9 +50,12 @@ import i18n from "../../i18n";
 import { getNotification } from "../../utils/request/common";
 import TokenService from "../../utils/storage/tokenService";
 import { useAppStore } from "../../store/useAppStore";
+import AndroidShell from "../androidShell";
+import type { AndroidDrawerControls } from "../androidShell/component";
 
 export interface HeaderProps {
   handleDrag: (isDrag: boolean) => void;
+  androidDrawer?: AndroidDrawerControls;
 }
 
 export interface HeaderState {
@@ -770,6 +773,49 @@ const Header = (props: HeaderProps) => {
   }, [isAuthed]);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+  const handleManualSync = async () => {
+    if (isSyncingRef.current) return;
+    if (isAuthed && !ConfigService.getItem("defaultSyncOption")) {
+      toast(
+        t("Please add data source in the setting-Sync and backup first")
+      );
+      handleSetting(true);
+      handleSettingMode("sync");
+      return;
+    }
+    setIsSync(true);
+    try {
+      if (isAuthed) {
+        const userInfo = await handleFetchUserInfo();
+        await handleCloudSync(userInfo);
+      } else {
+        await handleKOReaderSync();
+      }
+    } finally {
+      setIsSync(false);
+    }
+  };
+
+  const sharedControls = (
+    <>
+      <ImportLocal handleDrag={props.handleDrag} />
+      <SupportDialog />
+      <UpdateInfo />
+    </>
+  );
+
+  if (props.androidDrawer) {
+    return (
+      <>
+        <AndroidShell
+          drawer={props.androidDrawer}
+          onSync={handleManualSync}
+          isSyncing={state.isSync}
+        />
+        {sharedControls}
+      </>
+    );
+  }
 
   return (
     <div
@@ -892,27 +938,7 @@ const Header = (props: HeaderProps) => {
         )}
         <div
           className="setting-icon-container"
-          onClick={async () => {
-            if (isAuthed) {
-              if (!ConfigService.getItem("defaultSyncOption")) {
-                toast(
-                  t(
-                    "Please add data source in the setting-Sync and backup first"
-                  )
-                );
-                handleSetting(true);
-                handleSettingMode("sync");
-                return;
-              }
-              setIsSync(true);
-              let userInfo = await handleFetchUserInfo();
-              await handleCloudSync(userInfo);
-            } else {
-              setIsSync(true);
-              await handleKOReaderSync();
-              setIsSync(false);
-            }
-          }}
+          onClick={handleManualSync}
           style={{ marginTop: "2px" }}
         >
           <span
@@ -929,14 +955,7 @@ const Header = (props: HeaderProps) => {
           </span>
         </div>
       </div>
-
-      <ImportLocal
-        {...({
-          handleDrag: props.handleDrag,
-        } as any)}
-      />
-      <SupportDialog />
-      <UpdateInfo />
+      {sharedControls}
     </div>
   );
 };

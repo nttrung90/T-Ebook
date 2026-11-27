@@ -1,9 +1,9 @@
 .setting-dialog-container {
-  width: 760px;
-  height: 540px;
+  width: min(760px, calc(100% - 24px));
+  height: min(540px, calc(100% - 24px));
   position: absolute;
-  left: calc(50% - 380px);
-  top: calc(50% - 270px);
+  inset: 0;
+  margin: auto;
   overflow: hidden;
   opacity: 1;
   z-index: 20;
@@ -11,6 +11,9 @@
   animation: popup 0.1s ease-in-out 0s 1;
   display: flex;
   flex-direction: row;
+}
+.manager .setting-dialog-container {
+  z-index: 1041;
 }
 .setting-dialog-sidebar {
   width: 180px;
@@ -31,6 +34,8 @@
   letter-spacing: 0.5px;
 }
 .setting-dialog-sidebar-group {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 0px;
 }
 .setting-dialog-sidebar-item {
@@ -39,7 +44,11 @@
   gap: 9px;
   padding: 8.5px 14px 8.5px 18px;
   font-size: 14px;
+  font-family: inherit;
   font-weight: 500;
+  color: inherit;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   border-radius: 8px;
   margin: 1px 8px;
@@ -79,9 +88,11 @@
 .setting-dialog-main-header {
   font-size: 22px;
   font-weight: 700;
-  padding: 22px 28px 10px 28px;
+  padding: 22px 56px 10px 20px;
   flex-shrink: 0;
-  padding-left: 20px;
+}
+.setting-dialog-category {
+  display: none;
 }
 .setting-dialog-title {
   font-size: 18px;
@@ -236,6 +247,17 @@
 
 .setting-close-container:hover {
   border-radius: 50%;
+}
+button.setting-close-container {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+}
+button.setting-close-container .setting-close {
+  margin: 0;
 }
 .setting-close {
   margin-right: 10px;
@@ -757,4 +779,40 @@
 }
 .ai-setting-form-row .token-dialog-username-box {
   margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .setting-dialog-sidebar,
+  .setting-dialog-main-header {
+    display: none;
+  }
+
+  .setting-dialog-category {
+    display: block;
+    align-self: stretch;
+    min-height: 44px;
+    margin: 10px 56px 10px 12px;
+    padding: 0 12px;
+    border: 1px solid var(--sidebar-divider);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  .setting-dialog-main > .setting-close-container {
+    right: 6px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .account-login-grid {
+    margin-inline: 25px;
+  }
+
+  .account-login-option {
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
 }

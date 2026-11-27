@@ -1,0 +1,44 @@
+.route-not-found {
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1rem;
+  min-height: 100%;
+  padding: 1rem;
+  text-align: center;
+}
+
+.route-not-found h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 5vw, 2rem);
+  line-height: 1.25;
+}
+
+.route-not-found button {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.manager .route-not-found {
+  position: absolute;
+  inset: 80px 0 0 var(--sidebar-w);
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .manager .route-not-found {
+    top: 60px;
+  }
+}
+
+.manager.android-shell .route-not-found {
+  inset: var(--android-app-bar-height) 0 var(--android-bottom-nav-height) 0;
+}

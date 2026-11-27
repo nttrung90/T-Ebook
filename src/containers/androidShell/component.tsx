@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./androidShell.css";
 import SearchBox from "../../components/searchBox";
-import { isAndroidUi } from "../../utils/platform";
 import { useAppStore } from "../../store/useAppStore";
 
 const bottomNavItems = [
@@ -13,12 +12,27 @@ const bottomNavItems = [
   { mode: "highlight", name: "Highlights", icon: "highlight-line" },
 ];
 
-const AndroidShell = () => {
+export interface AndroidDrawerControls {
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+}
+
+const AndroidShell = ({
+  drawer,
+  onSync,
+  isSyncing,
+}: {
+  drawer: AndroidDrawerControls;
+  onSync: () => void;
+  isSyncing: boolean;
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const mode = useAppStore((s) => s.sidebar.mode);
   const shelfTitle = useAppStore((s) => s.sidebar.shelfTitle);
+  const isSortDisplay = useAppStore((s) => s.manager.isSortDisplay);
   const handleMode = useAppStore((s) => s.handleMode);
   const handleShelf = useAppStore((s) => s.handleShelf);
   const handleSelectBook = useAppStore((s) => s.handleSelectBook);
@@ -26,53 +40,22 @@ const AndroidShell = () => {
   const handleSearchResults = useAppStore((s) => s.handleSearchResults);
   const handleSortDisplay = useAppStore((s) => s.handleSortDisplay);
   const handleSetting = useAppStore((s) => s.handleSetting);
-  const handleImportDialog = useAppStore((s) => s.handleImportDialog);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  const isAndroid = isAndroidUi();
-
-  const openDrawer = () => {
-    document.documentElement.classList.add("m3-drawer-open");
-    setIsDrawerOpen(true);
-  };
-  const closeDrawer = () => {
-    document.documentElement.classList.remove("m3-drawer-open");
-    setIsDrawerOpen(false);
-  };
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isAndroid) return;
-    closeDrawer();
     setIsSearchOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+    handleSearch(false);
+    handleSearchResults([]);
+    handleSortDisplay(false);
+  }, [pathname, handleSearch, handleSearchResults, handleSortDisplay]);
 
   useEffect(() => {
-    if (!isSearchOpen) return;
-    const timer = window.setTimeout(() => {
-      document
-        .querySelector<HTMLInputElement>(".m3-search-bar .header-search-box")
-        ?.focus();
-    }, 80);
-    return () => window.clearTimeout(timer);
+    if (isSearchOpen) {
+      searchBarRef.current?.querySelector("input")?.focus();
+    }
   }, [isSearchOpen]);
-
-  useEffect(() => {
-    if (!isAndroid) return;
-    const handleSidebarClick = (event: MouseEvent) => {
-      const target = event.target as Element | null;
-      if (target?.closest(".sidebar .side-menu-item")) {
-        closeDrawer();
-      }
-    };
-    document.addEventListener("click", handleSidebarClick, true);
-    return () => document.removeEventListener("click", handleSidebarClick, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAndroid]);
-
-  if (!isAndroid) return null;
 
   const closeSearch = () => {
     setIsSearchOpen(false);
@@ -89,23 +72,19 @@ const AndroidShell = () => {
         );
 
   const goTo = (itemMode: string) => {
+    closeSearch();
     handleSelectBook(false);
     handleMode(itemMode);
     handleShelf("");
-    handleSearch(false);
     handleSortDisplay(false);
     navigate(`/manager/${itemMode}`);
   };
-
-  const isLibraryMode = ["home", "shelf", "favorite"].includes(mode);
-  const isMoreActive =
-    isDrawerOpen || !["home", "favorite", "note", "highlight"].includes(mode);
 
   return (
     <>
       <header className="m3-app-bar">
         {isSearchOpen ? (
-          <div className="m3-search-bar">
+          <div className="m3-search-bar" ref={searchBarRef}>
             <SearchBox />
             <button
               type="button"
@@ -122,7 +101,9 @@ const AndroidShell = () => {
               type="button"
               className="m3-icon-button"
               aria-label={t("Menu")}
-              onClick={openDrawer}
+              aria-controls="android-drawer"
+              aria-expanded={drawer.isOpen}
+              onClick={drawer.open}
             >
               <span className="icon-menu"></span>
             </button>
@@ -138,6 +119,24 @@ const AndroidShell = () => {
             <button
               type="button"
               className="m3-icon-button"
+              aria-label={t("Sort by")}
+              aria-expanded={isSortDisplay}
+              onClick={() => handleSortDisplay(!isSortDisplay)}
+            >
+              <span className="icon-sort-desc"></span>
+            </button>
+            <button
+              type="button"
+              className="m3-icon-button"
+              aria-label={t("Sync")}
+              disabled={isSyncing}
+              onClick={onSync}
+            >
+              <span className={isSyncing ? "icon-sync icon-rotate" : "icon-sync"}></span>
+            </button>
+            <button
+              type="button"
+              className="m3-icon-button"
               aria-label={t("Setting")}
               onClick={() => handleSetting(true)}
             >
@@ -149,8 +148,9 @@ const AndroidShell = () => {
 
       <div
         className="m3-scrim"
-        aria-hidden={!isDrawerOpen}
-        onClick={closeDrawer}
+        aria-hidden="true"
+        hidden={!drawer.isOpen}
+        onClick={drawer.close}
       ></div>
 
       <nav className="m3-bottom-nav" aria-label={t("Navigation")}>
@@ -158,13 +158,11 @@ const AndroidShell = () => {
           <button
             key={item.mode}
             type="button"
-            className={
-              "m3-bottom-nav-item" +
-              (mode === item.mode ? " m3-bottom-nav-item-active" : "")
-            }
+            className="m3-bottom-nav-item"
+            aria-current={mode === item.mode ? "page" : undefined}
             onClick={() => goTo(item.mode)}
           >
-            <span className="m3-bottom-nav-indicator">
+            <span className="m3-bottom-nav-indicator" aria-hidden="true">
               <span className={`icon-${item.icon}`}></span>
             </span>
             <span className="m3-bottom-nav-label">{t(item.name)}</span>
@@ -172,29 +170,20 @@ const AndroidShell = () => {
         ))}
         <button
           type="button"
-          className={
-            "m3-bottom-nav-item" + (isMoreActive ? " m3-bottom-nav-item-active" : "")
+          className="m3-bottom-nav-item"
+          aria-current={
+            bottomNavItems.some((item) => item.mode === mode) ? undefined : "page"
           }
-          onClick={openDrawer}
+          aria-controls="android-drawer"
+          aria-expanded={drawer.isOpen}
+          onClick={drawer.open}
         >
-          <span className="m3-bottom-nav-indicator">
+          <span className="m3-bottom-nav-indicator" aria-hidden="true">
             <span className="icon-menu"></span>
           </span>
           <span className="m3-bottom-nav-label">{t("More")}</span>
         </button>
       </nav>
-
-      {isLibraryMode && (
-        <button
-          type="button"
-          className="m3-fab"
-          aria-label={t("Import")}
-          onClick={() => handleImportDialog(true)}
-        >
-          <span className="icon-add"></span>
-          <span className="m3-fab-label">{t("Import")}</span>
-        </button>
-      )}
     </>
   );
 };

@@ -13,9 +13,22 @@
   width: 40%;
   height: 100%;
 }
+.login-close-container,
+.login-next-button,
+.login-option-container,
+.login-region-option,
 .login-manual-token {
-  text-align: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
+}
+.login-manual-token {
+  display: block;
+  margin-inline: auto;
+  text-align: center;
 }
 .login-logo-img {
   width: 100px;
@@ -40,8 +53,13 @@
 }
 .login-close-container {
   position: absolute;
-  top: 30px;
-  right: 30px;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
 }
 .login-close-icon {
   font-size: 25px;
@@ -66,21 +84,36 @@
   margin: 0 40px 20px 40px;
   color: #585858;
 }
+.login-actions,
 .login-next-button {
-  width: 100px;
-  height: 40px;
-  border: 2px solid #585858;
-  color: #585858;
-  font-size: 17px;
   position: absolute;
   bottom: 30px;
   right: 30px;
+}
+.login-actions {
+  display: flex;
+  gap: 10px;
+}
+.login-actions .login-next-button {
+  position: static;
+}
+.login-next-button {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 2px solid #585858;
+  color: #585858;
+  font-size: 17px;
+  line-height: 1.2;
   border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   box-sizing: border-box;
+}
+.login-secondary-button {
+  border-color: transparent;
 }
 .login-term {
   font-size: 12px;
@@ -108,34 +141,40 @@
   line-height: 18px;
 }
 .login-option-container {
-  margin: 15px 0px;
-  width: 260px;
-  margin-left: calc(50% - 130px);
-  height: 40px;
+  box-sizing: border-box;
+  margin: 15px auto;
+  width: min(264px, 100%);
+  min-height: 44px;
+  padding: 6px 10px;
   border-radius: 20px;
   border: 2px solid #585858;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
   align-items: center;
-  cursor: pointer;
-  position: relative;
 }
 .login-region-container {
-  margin: 0px 0px;
-  width: 260px;
-  margin-left: calc(50% - 130px);
-  height: 25px;
+  margin: 0 auto;
+  width: min(264px, 100%);
+  min-height: 25px;
+  gap: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
-  position: relative;
+}
+.login-region-options {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.login-region-option[aria-pressed="true"] {
+  text-decoration: underline;
 }
 .login-input-container {
-  margin: 15px 0px;
-  width: 260px;
-  margin-left: calc(50% - 130px);
-  height: 40px;
+  box-sizing: border-box;
+  display: block;
+  margin: 15px auto;
+  width: min(264px, 100%);
+  height: 44px;
   border-radius: 20px;
   border: 2px solid #585858;
   position: relative;
@@ -144,17 +183,36 @@
   color: #585858;
   font-size: 15px;
 }
+.login-code-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(264px, 100%);
+  margin: 15px auto;
+}
+.login-code-row .login-input-container {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+.login-send-code {
+  min-height: 44px;
+  max-width: 45%;
+  font-size: 15px;
+}
+.login-send-code:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.login-submit {
+  min-height: 44px;
+  margin: 10px auto;
+}
 .login-option-icon {
-  margin: 10px;
   font-size: 17px;
 }
 .login-option-title {
-  margin: 10px;
-  width: calc(100%);
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  line-height: 1.2;
 }
 .login-sync-box {
   /* border: 1px solid #585858; */
@@ -243,4 +301,98 @@
   top: 10px;
   right: 10px;
   opacity: 0.8;
+}
+
+@media (max-width: 850px) {
+  .login-container {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  .login-cover-container {
+    position: relative;
+    width: 100%;
+    height: 72px;
+  }
+
+  .login-logo-img {
+    top: 24px;
+    left: 20px;
+  }
+
+  .login-cover-img {
+    display: none;
+  }
+
+  .login-content-container {
+    box-sizing: border-box;
+    width: min(100%, 480px);
+    height: auto;
+    margin: 0 auto;
+    padding: 24px 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .login-content-illustration {
+    width: 100px;
+    max-width: 140px;
+    margin: 0 0 16px;
+  }
+
+  .login-container .login-title {
+    margin: 0 0 12px !important;
+    font-size: 24px;
+    line-height: 1.25;
+  }
+
+  .login-subtitle {
+    margin: 0 0 20px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .login-actions,
+  .login-next-button {
+    position: static;
+    justify-content: flex-end;
+  }
+
+  .login-next-button {
+    min-height: 44px;
+    justify-content: center;
+    margin-inline-start: auto;
+  }
+
+  .login-actions .login-next-button {
+    margin-inline-start: 0;
+  }
+
+  .login-option-box,
+  .login-mobile-container {
+    height: auto;
+  }
+
+  .login-option-box > div,
+  .login-term,
+  .login-billing-info {
+    box-sizing: border-box;
+    width: min(100%, 320px);
+  }
+
+  .login-sync-container {
+    width: 100%;
+    height: auto;
+    margin: 12px 0;
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+    grid-template-rows: none;
+  }
+
+  .login-sync-box {
+    width: 100%;
+  }
+
+  .login-mobile-container .login-mobile-qr {
+    max-width: 180px;
+  }
 }

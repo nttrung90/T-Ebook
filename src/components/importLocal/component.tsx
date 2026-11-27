@@ -36,6 +36,7 @@ import {
   importNoteRecords,
 } from "../../utils/file/import";
 import { useAppStore } from "../../store/useAppStore";
+import { isAndroidUi } from "../../utils/platform";
 
 export interface ImportLocalProps {
   handleDrag: (isDrag: boolean) => void;
@@ -93,9 +94,10 @@ const getComicImageExt = (name: string) => {
 };
 
 const ImportLocal = (props: ImportLocalProps) => {
+  const androidUi = isAndroidUi();
   const books = useAppStore((s) => s.manager.books);
   const cloudSyncFunc = useAppStore((s) => s.book.cloudSyncFunc);
-  const isCollapsed = useAppStore((s) => s.sidebar.isCollapsed);
+  const isCollapsed = useAppStore((s) => s.sidebar.isCollapsed) && !androidUi;
   const deletedBooks = useAppStore((s) => s.manager.deletedBooks);
   const mode = useAppStore((s) => s.sidebar.mode);
   const shelfTitle = useAppStore((s) => s.sidebar.shelfTitle);
@@ -1231,7 +1233,11 @@ const ImportLocal = (props: ImportLocalProps) => {
       >
         {({ getRootProps, getInputProps }) => (
           <div
-            className="import-from-local"
+            className={
+              androidUi && ["home", "favorite", "shelf"].includes(mode)
+                ? "import-from-local m3-fab"
+                : "import-from-local"
+            }
             {...getRootProps()}
             style={
               isCollapsed && document.body.clientWidth < 950
@@ -1240,18 +1246,25 @@ const ImportLocal = (props: ImportLocalProps) => {
             }
           >
             {isCollapsed && stateRef.current.width < 950 ? null : (
-              <div
-                className="more-import-option"
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering the Dropzone
-                  toggleMoreOptions();
-                }}
-              >
-                <span className="dropdown-triangle"></span>
+              <div className="more-import-option">
+                <button
+                  type="button"
+                  className="more-import-toggle"
+                  aria-label={t("Import options")}
+                  aria-expanded={state.isMoreOptionsVisible}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleMoreOptions();
+                  }}
+                  onKeyDown={(event) => event.stopPropagation()}
+                >
+                  <span className="dropdown-triangle"></span>
+                </button>
                 {stateRef.current.isMoreOptionsVisible && (
                   <div
                     className="more-options-dropdown"
-                    onMouseLeave={toggleMoreOptions}
+                    onClick={(event) => event.stopPropagation()}
+                    onMouseLeave={androidUi ? undefined : toggleMoreOptions}
                     style={
                       stateRef.current.width < 950
                         ? {

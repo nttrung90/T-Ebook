@@ -1,1 +1,222 @@
-/* Android shell styles */
+.android-shell {
+  --android-app-bar-height: 60px;
+  --android-bottom-nav-height: 64px;
+  --sidebar-w: 0px;
+}
+
+.android-shell .m3-app-bar,
+.android-shell .m3-bottom-nav {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 5;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-low);
+}
+
+.android-shell .m3-app-bar {
+  top: 0;
+  height: var(--android-app-bar-height);
+  padding-inline: 8px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.android-shell .m3-app-bar-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.android-shell .m3-icon-button,
+.android-shell .m3-bottom-nav-item {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.android-shell .m3-icon-button {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 21px;
+}
+
+.android-shell .m3-icon-button:active,
+.android-shell .m3-drawer .sidebar-list-icon:active {
+  background: var(--hover-bg);
+}
+
+.android-shell .m3-search-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.android-shell .m3-search-bar > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.android-shell .m3-bottom-nav {
+  bottom: 0;
+  height: var(--android-bottom-nav-height);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.android-shell .m3-bottom-nav-item {
+  display: grid;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding-inline: 3px;
+}
+
+.android-shell .m3-bottom-nav-indicator {
+  display: grid;
+  width: min(52px, 100%);
+  height: 28px;
+  align-items: center;
+  justify-items: center;
+  border-radius: 14px;
+  font-size: 19px;
+}
+
+.android-shell .m3-bottom-nav-item[aria-current="page"] .m3-bottom-nav-indicator,
+.android-shell .m3-bottom-nav-item[aria-expanded="true"] .m3-bottom-nav-indicator {
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+}
+
+.android-shell .m3-bottom-nav-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.android-shell .m3-scrim,
+.android-shell .m3-drawer {
+  position: absolute;
+  inset-block: 0;
+}
+
+.android-shell .m3-scrim {
+  inset-inline: 0;
+  z-index: 8;
+  background: var(--drag-bg);
+}
+
+.android-shell .m3-drawer {
+  inset-inline-start: 0;
+  z-index: 9;
+  width: min(320px, 86%);
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-2);
+}
+
+.android-shell .m3-drawer .sidebar {
+  width: 100% !important;
+  height: 100%;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.android-shell .m3-drawer .side-menu-container-parent {
+  width: 100%;
+}
+
+.android-shell .m3-drawer .sidebar-list-icon {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.android-shell .book-list-container-parent,
+.android-shell .note-list-container-parent,
+.android-shell .card-list-container-parent,
+.android-shell .empty-page-container {
+  left: 0 !important;
+  top: var(--android-app-bar-height) !important;
+  width: 100% !important;
+  height: calc(100% - var(--android-app-bar-height) - var(--android-bottom-nav-height)) !important;
+  box-sizing: border-box;
+}
+
+.android-shell .book-list-container-parent {
+  height: calc(100% - var(--android-app-bar-height) - var(--android-bottom-nav-height) - 48px) !important;
+}
+
+.android-shell .book-list-header {
+  left: 0 !important;
+  width: 100% !important;
+  bottom: calc(var(--android-bottom-nav-height) + 4px) !important;
+}
+
+.android-shell .book-card-scale-slider {
+  width: clamp(45px, 16vw, 120px) !important;
+}
+
+.android-shell .book-list-total-page {
+  margin-inline: 4px;
+}
+
+.android-shell .m3-fab {
+  top: auto !important;
+  right: 12px !important;
+  bottom: calc(var(--android-bottom-nav-height) + 56px) !important;
+  left: auto !important;
+  z-index: 6 !important;
+  margin: 0;
+  min-width: 118px;
+  padding-right: 48px !important;
+}
+
+.android-shell .import-from-local:not(.m3-fab) {
+  display: none !important;
+}
+
+.android-shell .more-import-option {
+  min-height: 44px;
+  width: 44px;
+}
+
+.android-shell .more-options-dropdown {
+  bottom: calc(100% + 5px) !important;
+  top: auto !important;
+  right: 0 !important;
+  left: auto !important;
+}
+
+.android-shell > .sort-dialog-container {
+  top: var(--android-app-bar-height);
+  left: auto;
+  right: 12px;
+  z-index: 10;
+}
+
+.android-shell > .backup-page-container:not(.local-file-dialog) {
+  width: min(454px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  inset: 0;
+  top: 0 !important;
+  margin: auto;
+}

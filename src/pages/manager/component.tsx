@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import "./manager.css";
 import Sidebar from "../../containers/sidebar";
@@ -38,6 +38,8 @@ import {
 import Footer from "../../components/footer";
 import ProtectionOverlay from "../../components/protection";
 import { useAppStore } from "../../store/useAppStore";
+import { isAndroidUi } from "../../utils/platform";
+import NotFound from "../notFound";
 
 const collectionUtil = new CollectionUtil(ConfigService);
 
@@ -115,6 +117,7 @@ const Manager = () => {
   const handleShowPopupNote = useAppStore((s) => s.handleShowPopupNote);
   const handleSortShelfDialog = useAppStore((s) => s.handleSortShelfDialog);
   const handleSetting = useAppStore((s) => s.handleSetting);
+  const handleSortDisplay = useAppStore((s) => s.handleSortDisplay);
   const handleCollectionDialog = useAppStore((s) => s.handleCollectionDialog);
   const handleCollectionDetailDialog = useAppStore(
     (s) => s.handleCollectionDetailDialog
@@ -124,6 +127,9 @@ const Manager = () => {
   );
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const androidUi = isAndroidUi();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [state, setState] = useState<ManagerState>({
     totalBooks: parseInt(ConfigService.getReaderConfig("totalBooks")) || 0,
     isDrag: false,
@@ -206,12 +212,20 @@ const Manager = () => {
       );
       ConfigService.setReaderConfig("totalBooks", totalBooks.toString());
     }
-    if (books && books.length === 1 && !prevBooks) {
+    if (
+      books?.length === 1 &&
+      !prevBooks &&
+      (pathname === "/manager/home" || pathname === "/manager/empty")
+    ) {
       navigate("/manager/home");
     }
     prevBooksRef.current = books;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [books]);
+
+  useEffect(() => {
+    setIsDrawerOpen(false);
+  }, [pathname]);
 
   const PopupProps = {
     chapterDocIndex: 0,
@@ -219,7 +233,7 @@ const Manager = () => {
   };
   return (
     <div
-      className={`manager ${isCollapsed ? "sidebar-collapsed" : ""}`}
+      className={`manager${androidUi ? " android-shell" : isCollapsed ? " sidebar-collapsed" : ""}`}
       onDragEnter={(e) => {
         if (isExternalFileDragEvent(e)) {
           handleDrag(true);
@@ -241,7 +255,7 @@ const Manager = () => {
       )}
 
       <div
-        className={`drag-background${state.isDrag ? " drag-active" : ""}`}
+        className={`drag-background${state.isDrag ? " drag-active" : ""}${isSettingOpen || isOpenLocalFileDialog ? " manager-dialog-backdrop" : ""}`}
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -332,6 +346,7 @@ const Manager = () => {
           handleShowPopupNote(false);
           handleSortShelfDialog(false);
           handleSetting(false);
+          if (androidUi) handleSortDisplay(false);
           handleCollectionDialog(false);
           handleCollectionDetailDialog(false);
           handleAddCollectionDialog(false);
@@ -339,6 +354,7 @@ const Manager = () => {
         }}
         style={
           isSettingOpen ||
+          (androidUi && isSortDisplay) ||
           isOpenImportDialog ||
           isOpenOPDSDialog ||
           isOpenAutoImportDialog ||
@@ -371,7 +387,13 @@ const Manager = () => {
           </div>
         )}
       </div>
-      <Sidebar />
+      {androidUi ? (
+        <div id="android-drawer" className="m3-drawer" hidden={!isDrawerOpen}>
+          <Sidebar onClose={() => setIsDrawerOpen(false)} />
+        </div>
+      ) : (
+        <Sidebar />
+      )}
       <Toaster
         toastOptions={{
           style: {
@@ -383,7 +405,18 @@ const Manager = () => {
           },
         }}
       />
-      <Header {...({ handleDrag: handleDrag } as any)} />
+      <Header
+        handleDrag={handleDrag}
+        androidDrawer={
+          androidUi
+            ? {
+                isOpen: isDrawerOpen,
+                open: () => setIsDrawerOpen(true),
+                close: () => setIsDrawerOpen(false),
+              }
+            : undefined
+        }
+      />
       {isOpenDeleteDialog && <DeleteDialog />}
       {isOpenDissolveDialog && (
         <DeleteDialog
@@ -399,7 +432,7 @@ const Manager = () => {
       {isOpenEditDialog && <EditDialog />}
       {isOpenAddDialog && <AddDialog />}
       {isShowLoading && <LoadingDialog />}
-      {isSortDisplay && <SortDialog />}
+      {isSortDisplay && <SortDialog dismissOnHover={!androidUi} />}
       {isOpenLocalFileDialog && <LocalFileDialog />}
       {isOpenImportDialog && <ImportDialog />}
       {isOpenOPDSDialog && <OPDSDialog />}
@@ -419,6 +452,7 @@ const Manager = () => {
               path={ele.path}
             />
           ))}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       )}
       <Footer />

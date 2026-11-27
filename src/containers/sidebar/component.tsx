@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./sidebar.css";
 import { sideMenu } from "../../constants/sideMenu";
@@ -27,9 +27,9 @@ export interface SidebarState {
   dropTargetShelf: string;
 }
 
-const Sidebar = () => {
+const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const mode = useAppStore((s) => s.sidebar.mode);
-  const isCollapsed = useAppStore((s) => s.sidebar.isCollapsed);
+  const isCollapsed = useAppStore((s) => s.sidebar.isCollapsed) && !onClose;
   const shelfTitle = useAppStore((s) => s.sidebar.shelfTitle);
   const isAuthed = useAppStore((s) => s.manager.isAuthed);
   const isOpenSortShelfDialog = useAppStore(
@@ -45,6 +45,7 @@ const Sidebar = () => {
   const handleFetchBooks = useAppStore((s) => s.handleFetchBooks);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [state, setState] = useState<SidebarState>(() => ({
     hoverMode: "",
     hoverShelfTitle: "",
@@ -63,17 +64,19 @@ const Sidebar = () => {
   }, []);
 
   useEffect(() => {
-    handleMode(
-      document.URL.split("/").reverse()[0] === "empty"
-        ? "home"
-        : document.URL.split("/").reverse()[0]
-    );
     document.addEventListener("dragend", handleDocumentDragEnd);
     return () => {
       document.removeEventListener("dragend", handleDocumentDragEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const nextMode = pathname.split("/").pop();
+    if (nextMode && nextMode !== "empty") {
+      handleMode(nextMode);
+    }
+  }, [pathname, handleMode]);
 
   useEffect(() => {
     // Focus the input when isCreateShelf changes from false to true
@@ -101,6 +104,7 @@ const Sidebar = () => {
     handleShelf("");
     handleSearch(false);
     handleSortDisplay(false);
+    onClose?.();
   };
   const handleHover = (mode: string) => {
     setState((prev) => ({ ...prev, hoverMode: mode }));
@@ -331,6 +335,7 @@ const Sidebar = () => {
               handleShelf(item);
               handleMode("shelf");
               navigate("/manager/shelf");
+              onClose?.();
             }}
             {...getBookDragHandlers(item, (event) => {
               handleBookDrop(item, event);
@@ -397,19 +402,28 @@ const Sidebar = () => {
   return (
     <>
       <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
-        <div
-          className="sidebar-list-icon"
-          onClick={() => {
-            handleCollapseSidebar(!isCollapsed);
-          }}
-        >
-          <span className="icon-menu sidebar-list"></span>
-        </div>
+        {onClose ? (
+          <button
+            type="button"
+            className="sidebar-list-icon"
+            aria-label={t("Close")}
+            onClick={onClose}
+          >
+            <span className="icon-close sidebar-list"></span>
+          </button>
+        ) : (
+          <div
+            className="sidebar-list-icon"
+            onClick={() => handleCollapseSidebar(!isCollapsed)}
+          >
+            <span className="icon-menu sidebar-list"></span>
+          </div>
+        )}
 
         <div
           className="logo-container"
           onClick={() => {
-            navigate("/manager/home");
+            handleSidebar("home");
           }}
           style={isCollapsed ? { display: "none" } : {}}
         >
@@ -530,6 +544,7 @@ const Sidebar = () => {
               style={{ cursor: "pointer" }}
               onClick={() => {
                 handleSortShelfDialog(true);
+                onClose?.();
               }}
             >
               <div
@@ -572,6 +587,7 @@ const Sidebar = () => {
             style={{ cursor: "pointer" }}
             onClick={() => {
               navigate("/stats");
+              onClose?.();
             }}
           >
             <div
