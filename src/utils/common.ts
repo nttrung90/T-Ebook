@@ -724,64 +724,61 @@ export const getPageWidth = (
 
     return limit;
   };
+  const clientWidth = document.body.clientWidth;
+  const isNarrowViewport = clientWidth < AUTO_SINGLE_PAGE_MAX_WIDTH;
+  const panelWidth = 300;
+  const lockedWidth =
+    (isNavLocked ? panelWidth : 0) + (isSettingLocked ? panelWidth : 0);
+  const parsedScale = Math.abs(parseFloat(scale));
+  const scaleFactor =
+    Number.isFinite(parsedScale) && parsedScale > 0 ? parsedScale : 1;
+  const safeMargin = Number.isFinite(margin) ? margin : 0;
+
   if (isFitPage && (readerMode === "scroll" || readerMode === "single")) {
     // 固定左右侧边栏时，页面只在剩余可用区域内铺满，避免被侧边栏遮挡
-    const panelWidth = 300;
-    let pageWidth =
-      document.body.clientWidth -
-      106 -
-      (isNavLocked ? panelWidth : 0) -
-      (isSettingLocked ? panelWidth : 0);
-    let pageOffset = 50 + (isNavLocked ? panelWidth : 0) + "px";
+    const sidePadding = isNarrowViewport ? 16 : 50;
+    const totalPadding = isNarrowViewport ? 32 : 106;
+    const pageWidth = Math.max(
+      4,
+      clientWidth - totalPadding - lockedWidth
+    );
+    const pageOffset = sidePadding + (isNavLocked ? panelWidth : 0) + "px";
     return {
       pageOffset,
       pageWidth: pageWidth + "px",
     };
   }
 
-  //缩放过高时按窗口宽度封顶
-  if (
-    document.body.clientWidth * 0.6 * Math.abs(parseFloat(scale)) >
-    document.body.clientWidth
-  ) {
-    let pageWidth = document.body.clientWidth - 106;
-    let pageOffset = 50 + "px";
-    return {
-      pageOffset,
-      pageWidth: pageWidth + "px",
-    };
-  }
+  const maxAvailableWidth = Math.max(4, clientWidth - 32 - lockedWidth);
+  const getCenteredOffset = (width: number) =>
+    `calc(50vw + ${isNavLocked ? 150 : 0}px - ${
+      isSettingLocked ? 150 : 0
+    }px - ${width / 2}px)`;
 
   let pageOffset = "";
   let pageWidth = 0;
   if (readerMode === "scroll" || readerMode === "single") {
-    //页面宽度以 scale=1 的默认宽度（视口宽度 * 0.6）为基准等比例缩放，
-    //使预设百分比与实际显示宽度成正比，避免低百分比时出现过窄页面
-    let preWidth =
-      document.body.clientWidth * 0.6 * Math.abs(parseFloat(scale)) -
-      (isNavLocked ? 300 : 0) -
-      (isSettingLocked ? 300 : 0);
-    let width = findValidMultiple(preWidth);
-    pageOffset = `calc(50vw + ${isNavLocked ? 150 : 0}px - ${
-      isSettingLocked ? 150 : 0
-    }px - ${width / 2}px)`;
+    // 窄屏（含移动端）直接以视口可用宽度为基准，避免 0.6/0.75 倍导致两侧留白过大；
+    // 桌面端以视口宽度的 0.75 为 scale=1 基准，兼顾阅读舒适度与缩放预设档位区分
+    const rawPreWidth = isNarrowViewport
+      ? Math.max(0, clientWidth - 2 * safeMargin - 32 - lockedWidth) *
+        scaleFactor
+      : clientWidth * 0.75 * scaleFactor - 2 * safeMargin - lockedWidth;
+    const preWidth = Math.max(4, Math.min(rawPreWidth, maxAvailableWidth));
+    const width = findValidMultiple(preWidth);
+    pageOffset = getCenteredOffset(width);
     pageWidth = width;
   } else if (readerMode === "double") {
-    let width = findValidMultiple(
-      document.body.clientWidth -
-        2 * margin -
-        80 -
-        (isNavLocked ? 300 : 0) -
-        (isSettingLocked ? 300 : 0)
+    const preWidth = Math.max(
+      4,
+      Math.min(
+        clientWidth - 2 * safeMargin - 80 - lockedWidth,
+        maxAvailableWidth
+      )
     );
-    pageOffset = `calc(50vw + ${isNavLocked ? 150 : 0}px - ${
-      isSettingLocked ? 150 : 0
-    }px - ${width / 2}px)`;
+    const width = findValidMultiple(preWidth);
+    pageOffset = getCenteredOffset(width);
     pageWidth = width;
-  }
-  if (pageWidth > document.body.clientWidth) {
-    pageWidth = document.body.clientWidth - 106;
-    pageOffset = 50 + "px";
   }
   return {
     pageOffset,

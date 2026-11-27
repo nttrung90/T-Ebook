@@ -90,7 +90,7 @@
   .import-from-cloud {
     position: fixed;
     right: 20px;
-    bottom: 84px;
+    bottom: 108px;
     left: auto;
     top: auto;
     width: 138px;
@@ -98,17 +98,21 @@
   .import-from-local {
     position: fixed !important;
     right: 20px !important;
-    bottom: 24px !important;
+    bottom: 48px !important;
     left: auto !important;
     top: auto !important;
     width: auto !important;
-    min-width: 110px !important;
-    padding: 0 18px !important;
+    min-width: 118px !important;
+    padding: 0 36px 0 18px !important;
     height: 48px !important;
     line-height: 48px !important;
     border-radius: 24px !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28) !important;
     z-index: 950 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
   }
   .header-report-container {
     display: none !important;
@@ -240,8 +244,8 @@
 
 @media screen and (max-width: 768px) {
   .header {
-    margin-left: var(--sidebar-w, 175px) !important;
-    width: calc(100% - var(--sidebar-w, 175px)) !important;
+    margin-left: 56px !important;
+    width: calc(100% - 56px) !important;
     height: 60px !important;
     display: flex !important;
     align-items: center !important;
@@ -261,16 +265,19 @@
     position: relative !important;
     top: auto !important;
     margin-left: 0 !important;
-    flex: 1 !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
     width: auto !important;
     max-width: none !important;
+    overflow: hidden !important;
   }
 
   .header-search-box {
     width: 100% !important;
     height: 36px !important;
     font-size: 13px !important;
+    padding: 0 34px 0 12px !important;
+    box-sizing: border-box !important;
   }
 
   .setting-icon-parrent {

@@ -1,7 +1,7 @@
 {
   "name": "t-ebook",
   "main": "main.js",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "T-Ebook is a cross-platform ebook reader",
   "author": {
     "name": "App by Troye",

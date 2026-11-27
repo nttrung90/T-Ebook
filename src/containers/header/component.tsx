@@ -774,7 +774,7 @@ const Header = (props: HeaderProps) => {
   return (
     <div
       className="header"
-      style={isCollapsed && !isMobile ? { marginLeft: "40px" } : {}}
+      style={isCollapsed && !isMobile ? { marginLeft: "70px" } : {}}
     >
       {isAuthed && (
         <div

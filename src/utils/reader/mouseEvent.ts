@@ -20,6 +20,7 @@ import {
   ShortcutAction,
 } from "./shortcutUtil";
 import { OVERLAY_TURN_DURATION } from "./overlayTurn";
+import { isAndroidUi } from "../platform";
 declare var window: any;
 
 // 翻页滑动动画固定时长（毫秒），需与 kookit 的 PAGE_TURN_DURATION 保持一致
@@ -58,6 +59,8 @@ window.addEventListener("page-flipend", () => {
 const WHEEL_QUIET_MS = 120;
 const WHEEL_SPIKE_GAP_MS = 50;
 const WHEEL_SPIKE_MIN_DELAY = 250;
+const WHEEL_DISCRETE_GAP_MS = 40;
+const WHEEL_DISCRETE_MIN_DELAY = 150;
 let wheelArmed = true;
 let wheelQuietTimer: ReturnType<typeof setTimeout> | null = null;
 let wheelRefDelta = 0; // 上一次翻页后惯性流的参考幅度（随惯性逐帧衰减）
@@ -102,6 +105,17 @@ const acquireWheelArm = (delta: number, gap: number) => {
     return true;
   }
   const magnitude = Math.abs(delta);
+  // 离散鼠标滚轮间隔通常 >= 40ms 且幅度不会像触控板惯性那样逐帧衰减；
+  // 距上次翻页 >= 150ms 且当前无在途翻页时直接放行，避免连续滚动被静默计时吞掉
+  if (
+    wheelTurnInFlightCount === 0 &&
+    gap >= WHEEL_DISCRETE_GAP_MS &&
+    now - wheelConsumeTime >= WHEEL_DISCRETE_MIN_DELAY &&
+    (magnitude >= wheelRefDelta * 0.9 || magnitude >= 40)
+  ) {
+    beginWheelTurn(delta, now);
+    return true;
+  }
   if (
     gap < WHEEL_SPIKE_GAP_MS &&
     now - wheelConsumeTime >= WHEEL_SPIKE_MIN_DELAY &&
@@ -526,9 +540,23 @@ export const scrollChapter = async (
   }
 };
 let lastScaleTime = 0;
+interface BoundDocContext {
+  rendition: any;
+  book: Book;
+  readerMode: string;
+  handleScale: (scale: string) => void;
+  renderBookFunc: () => void;
+  hammerAttached: boolean;
+}
 // kookit 渲染章节时复用同一个 iframe document，"rendered" 每触发一次就会
-// 走到这里重绑一遍，用 WeakSet 保证同一 doc 只绑定一次
-const boundDocs = new WeakSet<Document>();
+// 走到这里重绑一遍，用 WeakMap 保证同一 doc 只绑定一次监听，同时每次更新最新上下文
+const boundDocs = new WeakMap<Document, BoundDocContext>();
+const isTouchGestureEnabled = () =>
+  ConfigService.getReaderConfig("isTouch") === "yes" ||
+  isAndroidUi() ||
+  "ontouchstart" in window ||
+  (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0);
+
 export const bindHtmlEvent = (
   rendition: any,
   doc: any,
@@ -537,23 +565,67 @@ export const bindHtmlEvent = (
   handleScale: (scale: string) => void,
   renderBookFunc: () => void
 ) => {
-  if (boundDocs.has(doc)) return;
-  boundDocs.add(doc);
-  const key = book.key;
-  const format = book.format;
+  const existingCtx = boundDocs.get(doc);
+  const nextCtx: BoundDocContext = {
+    rendition,
+    book,
+    readerMode,
+    handleScale,
+    renderBookFunc,
+    hammerAttached: existingCtx?.hammerAttached ?? false,
+  };
+  boundDocs.set(doc, nextCtx);
+
+  if (!nextCtx.hammerAttached && isTouchGestureEnabled()) {
+    nextCtx.hammerAttached = true;
+    const mc = new Hammer(doc);
+    mc.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+    mc.on("panleft panright panup pandown", async (event: any) => {
+      const ctx = boundDocs.get(doc);
+      if (!ctx || ctx.readerMode === "scroll") {
+        return;
+      }
+      // 一次滑动过程中 Hammer 会连续派发多个 pan 事件，加锁保证一次手势只翻一页
+      if (lock || event.pointerType === "mouse") return;
+      lock = true;
+      try {
+        await gesture(ctx.rendition, event.type);
+        handleLocation(ctx.book.key, ctx.rendition);
+      } finally {
+        setTimeout(() => (lock = false), getThrottleTime());
+      }
+    });
+  }
+
+  if (existingCtx) return;
+
   doc.addEventListener(
     "keydown",
-    async (event) => {
-      await arrowKeys(rendition, event, readerMode, book);
-      handleLocation(key, rendition);
+    async (event: any) => {
+      const ctx = boundDocs.get(doc);
+      if (!ctx) return;
+      await arrowKeys(ctx.rendition, event, ctx.readerMode, ctx.book);
+      handleLocation(ctx.book.key, ctx.rendition);
     },
     { passive: false }
   );
 
   doc.addEventListener(
     "wheel",
-    async (event) => {
-      if (event.ctrlKey && readerMode !== "double") {
+    async (event: any) => {
+      const ctx = boundDocs.get(doc);
+      if (!ctx) return;
+      const {
+        rendition: currentRendition,
+        book: currentBook,
+        readerMode: currentReaderMode,
+        handleScale: currentHandleScale,
+        renderBookFunc: currentRenderBookFunc,
+      } = ctx;
+      const currentKey = currentBook.key;
+      const currentFormat = currentBook.format;
+
+      if (event.ctrlKey && currentReaderMode !== "double") {
         const currentTime = Date.now();
         if (currentTime - lastScaleTime < 1500) {
           return;
@@ -566,100 +638,92 @@ export const bindHtmlEvent = (
         } else {
           ConfigService.setReaderConfig("scale", scale - 0.1 + "");
         }
-        handleScale(ConfigService.getReaderConfig("scale") || "1");
-        renderBookFunc();
+        currentHandleScale(ConfigService.getReaderConfig("scale") || "1");
+        currentRenderBookFunc();
         return;
       }
       // 阅读尺等辅助模式下滚轮完全接管为逐段导航，先拦截原生滚动，
       // 避免与遮罩过渡动画叠加造成动画掉帧
       if (
-        readerMode === "scroll" &&
+        currentReaderMode === "scroll" &&
         Math.abs(event.deltaX) === 0 &&
-        isReadingAidMode(format, key)
+        isReadingAidMode(currentFormat, currentKey)
       ) {
         event.preventDefault();
       }
-      // 触控板一次滑动（含惯性）会派发一整串 wheel 事件：挂起期内任何
-      // 滚轮事件（含噪声级）都代表惯性流仍在继续，统一顺延静默计时；
-      // 噪声级滚动不翻页。preventDefault 必须在这之前执行（见上），
-      // 挂起期内到达的滚轮事件仍要拦截原生滚动
       const dominantDelta =
         Math.abs(event.deltaX) > Math.abs(event.deltaY)
           ? event.deltaX
           : event.deltaY;
+      // 仅在有效滚轮位移（>= 1）时顺延静默计时与更新事件间隔，避免亚像素噪声误延计时
+      if (Math.abs(dominantDelta) < 1) return;
       const now = performance.now();
       const gap = now - wheelLastEventTime;
       wheelLastEventTime = now;
       if (!wheelArmed) deferWheelArm();
-      if (Math.abs(dominantDelta) < 1) return;
-      if (readerMode === "scroll") {
-        if (Math.abs(event.deltaX) === 0 && isReadingAidMode(format, key)) {
+      if (currentReaderMode === "scroll") {
+        if (
+          Math.abs(event.deltaX) === 0 &&
+          isReadingAidMode(currentFormat, currentKey)
+        ) {
           // 段落/阅读尺/速读模式内部实际按单页渲染，同样遵循 RTL
           if (!acquireWheelArm(event.deltaY, gap)) return;
           try {
             await mouseChrome(
-              rendition,
+              currentRendition,
               event.deltaY,
-              isRevertDirectionReading(rendition)
+              isRevertDirectionReading(currentRendition)
             );
           } finally {
             endWheelTurn();
           }
         } else {
           await sleep(200);
-          await rendition.record();
+          await currentRendition.record();
           if (
             Math.abs(event.deltaX) === 0 &&
             ConfigService.getReaderConfig("isDisableAutoScroll") !== "yes"
           ) {
             let srollElement = document.getElementById("page-area");
-            await scrollChapter(srollElement, rendition, event.deltaY, gap);
+            await scrollChapter(
+              srollElement,
+              currentRendition,
+              event.deltaY,
+              gap
+            );
           }
         }
       } else {
         if (!acquireWheelArm(dominantDelta, gap)) return;
         try {
-          const revertDirection = isRevertDirectionReading(rendition);
+          const revertDirection = isRevertDirectionReading(currentRendition);
           // 触控板双指滑动按主导方向翻页：垂直滑动（含轻微水平噪声）按
           // deltaY 翻页，水平分量占优时按 deltaX 翻页，RTL 下整体镜像
           if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
             // 向左滚动（deltaX<0）在 RTL 下为下一页，LTR 下为上一页
-            await mouseChrome(rendition, event.deltaX, revertDirection);
+            await mouseChrome(currentRendition, event.deltaX, revertDirection);
           } else {
-            await mouseChrome(rendition, event.deltaY, revertDirection);
+            await mouseChrome(currentRendition, event.deltaY, revertDirection);
           }
         } finally {
           endWheelTurn();
         }
       }
-      handleLocation(key, rendition);
+      handleLocation(currentKey, currentRendition);
     },
     { passive: false }
   );
 
-  if (ConfigService.getReaderConfig("isTouch") === "yes") {
-    const mc = new Hammer(doc);
-    mc.on("panleft panright panup pandown", async (event: any) => {
-      if (readerMode === "scroll") {
-        return;
-      }
-      // 一次滑动过程中 Hammer 会连续派发多个 pan 事件，加锁保证一次手势只翻一页
-      if (lock || event.pointerType === "mouse") return;
-      lock = true;
-      await gesture(rendition, event.type);
-      handleLocation(key, rendition);
-      setTimeout(() => (lock = false), getThrottleTime());
-    });
-  }
-
   doc.addEventListener(
     "touchend",
     async () => {
-      if (readerMode === "scroll") {
+      const ctx = boundDocs.get(doc);
+      if (!ctx) return;
+      if (ctx.readerMode === "scroll") {
         await sleep(200);
-        await rendition.record();
+        await ctx.rendition.record();
       }
-      handleLocation(key, rendition);
+      handleLocation(ctx.book.key, ctx.rendition);
     },
     { passive: false }
   );
